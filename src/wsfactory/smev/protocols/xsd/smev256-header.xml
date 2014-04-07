@@ -1,0 +1,14 @@
+<rev:Header actor="string" xmlns:rev="http://smev.gosuslugi.ru/rev120315">
+  <rev:NodeId>string</rev:NodeId>
+  <rev:MessageId>string</rev:MessageId>
+  <rev:TimeStamp>2008-09-29T05:49:45</rev:TimeStamp>
+  <rev:MessageClass>REQUEST</rev:MessageClass>
+  <!--Optional:-->
+  <rev:PacketIds>
+    <!--1 or more repetitions:-->
+    <rev:Id>
+      <rev:MessageId>string</rev:MessageId>
+      <rev:SubRequestNumber>string</rev:SubRequestNumber>
+    </rev:Id>
+  </rev:PacketIds>
+</rev:Header>

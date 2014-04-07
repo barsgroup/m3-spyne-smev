@@ -1,0 +1,41 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                  xmlns:inf="http://smev.gosuslugi.ru/inf"
+                  xmlns:smev="http://smev.gosuslugi.ru/rev120315" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://smev.gosuslugi.ru/rev120315 smev256.xsd">
+    <soapenv:Header>
+        <smev:Header actor="http://smev.gosuslugi.ru/recipient">
+            <smev:NodeId>34545645</smev:NodeId>
+            <smev:MessageId>SDADAJHFGJASHGDJASHGD</smev:MessageId>
+            <smev:TimeStamp>2014-03-21T11:42:37.491</smev:TimeStamp>
+            <smev:MessageClass>REQUEST</smev:MessageClass>
+        </smev:Header>
+    </soapenv:Header>
+    <soapenv:Body>
+        <inf:SayHelloRequest>
+            <smev:Message>
+                <smev:Sender>
+                    <smev:Code>124245345</smev:Code>
+                    <smev:Name>sdfsdfsdfsd</smev:Name>
+                </smev:Sender>
+                <smev:Recipient>
+                    <smev:Code>345346456</smev:Code>
+                    <smev:Name>gdfgdfgsdfsdf</smev:Name>
+                </smev:Recipient>
+                <smev:Service>
+                    <smev:Mnemonic>45645746</smev:Mnemonic>
+                    <smev:Version>1.20</smev:Version>
+                </smev:Service>
+                <smev:TypeCode>GSRV</smev:TypeCode>
+                <smev:Status>REQUEST</smev:Status>
+                <smev:Date>2014-03-21T11:42:37.491</smev:Date>
+                <smev:ExchangeType>0</smev:ExchangeType>
+            </smev:Message>
+            <smev:MessageData>
+                <smev:AppData>
+                    <inf:Name>Tim</inf:Name>
+                    <inf:Times>4</inf:Times>
+                </smev:AppData>
+            </smev:MessageData>
+        </inf:SayHelloRequest>
+    </soapenv:Body>
+</soapenv:Envelope>

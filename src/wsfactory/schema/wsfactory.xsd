@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="http://bars-open.ru/schema/wsfactory"
+           xmlns="http://bars-open.ru/schema/wsfactory"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified">
+    <xs:element name="Config">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="System" minOccurs="0" maxOccurs="1">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="Logger" minOccurs="1"
+                                        maxOccurs="1">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="LogLevel" type="xs:string"
+                                                    minOccurs="1" maxOccurs="1"/>
+                                        <xs:element name="LogDir" type="xs:string"
+                                                    minOccurs="1" maxOccurs="1"/>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="UI" minOccurs="1" maxOccurs="1">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="LogRegistry" minOccurs="1" maxOccurs="1">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <xs:element name="Enabled" type="xs:boolean"
+                                                                minOccurs="1" maxOccurs="1"/>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+                                        <xs:element name="PermissionChecker"
+                                                    minOccurs="0" maxOccurs="1">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <xs:element name="Module" type="xs:string"
+                                                                minOccurs="1" maxOccurs="1"/>
+                                                    <xs:element name="Permissions" minOccurs="0" maxOccurs="1">
+                                                        <xs:complexType>
+                                                            <xs:sequence>
+                                                                <xs:element name="View" type="xs:string"
+                                                                            maxOccurs="unbounded"/>
+                                                                <xs:element name="Archive" type="xs:string"
+                                                                            maxOccurs="unbounded"/>
+                                                            </xs:sequence>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="WS" minOccurs="1" maxOccurs="1">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="ProtocolRegistry" minOccurs="1" maxOccurs="1">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="Protocol" minOccurs="1" maxOccurs="unbounded">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <xs:element name="Module" type="xs:string"
+                                                                minOccurs="1" maxOccurs="1"/>
+                                                    <xs:element name="Direction" minOccurs="1" maxOccurs="1">
+                                                        <xs:simpleType>
+                                                            <xs:restriction base="xs:string">
+                                                                <xs:enumeration value="BOTH"/>
+                                                                <xs:enumeration value="IN"/>
+                                                                <xs:enumeration value="OUT"/>
+                                                            </xs:restriction>
+                                                        </xs:simpleType>
+                                                    </xs:element>
+                                                    <xs:element name="Name" type="xs:string"
+                                                                minOccurs="1" maxOccurs="1"/>
+                                                    <xs:element name="Doc" type="xs:string"
+                                                                minOccurs="1" maxOccurs="1" nillable="true"/>
+                                                    <xs:element name="Params" type="paramsType"
+                                                                minOccurs="0" maxOccurs="1"/>
+                                                </xs:sequence>
+                                                <xs:attribute name="code" type="xs:token" use="required"/>
+                                            </xs:complexType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="ApiRegistry" minOccurs="1" maxOccurs="1">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="Api" minOccurs="1" maxOccurs="unbounded">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <xs:element name="Module" type="xs:string" minOccurs="1" maxOccurs="1"/>
+                                                    <xs:element name="Doc" type="xs:string" minOccurs="1" maxOccurs="1" nillable="true"/>
+                                                </xs:sequence>
+                                                <xs:attribute name="code" use="required"/>
+                                            </xs:complexType>
+                                         </xs:element>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="ServiceRegistry" minOccurs="1" maxOccurs="1">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="Service" minOccurs="1" maxOccurs="unbounded">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <xs:element name="Name" type="xs:string" minOccurs="1" maxOccurs="1"/>
+                                                    <xs:element name="Doc" type="xs:string" minOccurs="1" maxOccurs="1"/>
+                                                    <xs:element name="Api" minOccurs="1" maxOccurs="unbounded">
+                                                        <xs:complexType>
+                                                            <xs:attribute name="code" type="xs:string" use="required"/>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                </xs:sequence>
+                                                <xs:attribute name="code" type="xs:string" use="required"/>
+                                                <xs:attribute name="tns" type="xs:anyURI" use="optional"
+                                                              default="http://bars-open.ru/inf"/>
+                                            </xs:complexType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                    <xs:attribute name="defaultTNS" type="xs:anyURI" use="optional"/>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="SecurityProfile" minOccurs="1" maxOccurs="1">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="Security" minOccurs="0" maxOccurs="unbounded">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <xs:element name="Module" type="xs:string" minOccurs="1" maxOccurs="1"/>
+                                                    <xs:element name="Params" type="paramsType" minOccurs="0" maxOccurs="1"/>
+                                                </xs:sequence>
+                                                <xs:attribute name="code" type="xs:string"/>
+                                            </xs:complexType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="ServiceProtocols" minOccurs="1" maxOccurs="1">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="Service" minOccurs="1" maxOccurs="unbounded">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <xs:element name="inProtocol" type="protocolType"
+                                                                minOccurs="1" maxOccurs="1"/>
+                                                    <xs:element name="outProtocol" type="protocolType"
+                                                                minOccurs="1" maxOccurs="1"/>
+                                                </xs:sequence>
+                                                <xs:attribute name="code" type="xs:string" use="required"/>
+                                            </xs:complexType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="protocolType">
+        <xs:sequence>
+            <xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
+        </xs:sequence>
+        <xs:attribute name="code" use="required" type="xs:string"/>
+        <xs:attribute name="security" type="xs:string"/>
+    </xs:complexType>
+    <xs:complexType name="paramsType">
+        <xs:sequence>
+            <xs:any minOccurs="1" maxOccurs="unbounded" processContents="lax"/>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>

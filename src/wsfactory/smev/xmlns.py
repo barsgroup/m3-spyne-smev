@@ -10,7 +10,9 @@ xmlns.py
 smev245 = "http://smev.gosuslugi.ru/rev111111"
 smev256 = "http://smev.gosuslugi.ru/rev120315"
 inf = "http://smev.gosuslugi.ru/inf"
-soapenv = soap = "http://schemas.xmlsoap.org/soap/envelope/"
+soapenv = "http://schemas.xmlsoap.org/soap/envelope/"
+wsdl = "http://schemas.xmlsoap.org/wsdl/"
+soap = "http://schemas.xmlsoap.org/wsdl/soap/"
 ds = "http://www.w3.org/2000/09/xmldsig#"
 wsse = (
     "http://docs.oasis-open.org/wss/2004/01/"
@@ -22,15 +24,20 @@ v25 = "http://idecs.atc.ru/orderprocessing/ws/eventservice/v25/"
 gostr3410 = "http://www.w3.org/2001/04/xmldsig-more#gostr34102001-gostr3411"
 gostr3411hash = "http://www.w3.org/2001/04/xmldsig-more#gostr3411"
 c14n = "http://www.w3.org/2001/10/xml-exc-c14n#"
+xs = "http://www.w3.org/2001/XMLSchema"
 
 _nsmap = {
+    'xs': xs,
+    'soapenv': soapenv,
+    'soap': soap,
     'wsse': wsse,
     'wsu': wsu,
     'inf': inf,
     'ds': ds,
+    'wsdl': wsdl,
 }
 nsmap256 = _nsmap.copy()
-nsmap256.update({'soapenv': soapenv, 'smev': smev256})
+nsmap256.update({'smev': smev256})
 
 nsmap245 = _nsmap.copy()
-nsmap245.update({'soap': soap, 'smev': smev245})
+nsmap245.update({'smev': smev245})

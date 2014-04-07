@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config xmlns="http://bars-open.ru/schema/wsfactory"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://bars-open.ru/schema/wsfactory wsfactory.xsd">
+    <System>
+        <Logger>
+            <LogLevel>DEBUG</LogLevel>
+            <LogDir>/tmp/logs</LogDir>
+        </Logger>
+        <UI>
+            <LogRegistry>
+                <Enabled>true</Enabled>
+            </LogRegistry>
+            <PermissionChecker>
+                <Module/>
+                <Permissions>
+                    <View>WSFACTORY_VIEW</View>
+                    <View>SUPER_ADMIN_VIEW</View>
+                    <Archive>WSFACTORY_ARCHIVE</Archive>
+                </Permissions>
+            </PermissionChecker>
+        </UI>
+    </System>
+    <WS>
+        <ProtocolRegistry>
+            <Protocol code="smev256">
+                <Module>wsfactory.smev.Smev256</Module>
+                <Direction>BOTH</Direction>
+                <Name>СМЭВ 2.5.6</Name>
+                <Doc>Обёртка протокола SOAP 1.1 согласно методическим рекомендациям СМЭВ версии 2.5.6</Doc>
+                <Params>
+                    <SenderCode>987654321</SenderCode>
+                    <SenderName>MINOBR</SenderName>
+                </Params>
+            </Protocol>
+            <Protocol code="soap11">
+                <Module>spyne.protocol.soap.soap11.Soap11</Module>
+                <Direction>BOTH</Direction>
+                <Name>SOAP 1.1</Name>
+                <Doc>Протокол передачи сообщений SOAP версии 1.1</Doc>
+            </Protocol>
+            <Protocol code="soap11wsse">
+                <Module>wsfactory.smev.Soap11WSSE</Module>
+                <Direction>BOTH</Direction>
+                <Name>SOAP 1.1</Name>
+                <Doc>Протокол передачи сообщений SOAP версии 1.1 с поддержкой профиля безопасности WS-Security</Doc>
+            </Protocol>
+            <Protocol code="http-rpc">
+                <Module>spyne.protocol.http.HttpRpc</Module>
+                <Direction>IN</Direction>
+                <Name>HTTP RPC</Name>
+                <Doc/>
+            </Protocol>
+            <Protocol code="json">
+                <Module>spyne.protocol.json.JsonDocument</Module>
+                <Direction>BOTH</Direction>
+                <Name>JSON Protocol</Name>
+                <Doc/>
+            </Protocol>
+        </ProtocolRegistry>
+        <ApiRegistry>
+            <Api code="CreateOrderOU">
+                <Module>web_edu.core.declaration.wsapi.CreateOrderOU</Module>
+                <Doc>Подача заявления в учебное учреждение</Doc>
+            </Api>
+            <Api code="GetOU">
+                <Module>web_edu.core.declaration.wsapi.GetOU</Module>
+                <Doc>Получение списка учреждений</Doc>
+            </Api>
+            <Api code="SayHello">
+                <Module>web_edu.core.declaration.wsapi.SayHello</Module>
+                <Doc>Привет!</Doc>
+            </Api>
+        </ApiRegistry>
+        <ServiceRegistry defaultTNS="http://bars-open.ru/inf">
+            <Service code="Declaration">
+                <Name>DeclarationService</Name>
+                <Doc>Услуга подачи заявления в учебное учреждение</Doc>
+                <Api code="CreateOrderOU"/>
+                <Api code="GetOU"/>
+            </Service>
+            <Service code="HelloWorld">
+                <Name>HelloWorldService</Name>
+                <Doc>Say hello</Doc>
+                <Api code="SayHello"/>
+            </Service>
+        </ServiceRegistry>
+        <SecurityProfile>
+            <Security code="security">
+                <Module>wsfactory.smev.WSSecurity</Module>
+                <Params>
+                    <pem_file_name>/home/timic/projects/bars/edu/conf/pem.pem</pem_file_name>
+                    <private_key_pass>12345678</private_key_pass>
+                </Params>
+            </Security>
+        </SecurityProfile>
+        <ServiceProtocols>
+            <Service code="Declaration">
+                <inProtocol code="smev256">
+                    <Mnemonic>345373247</Mnemonic>
+                </inProtocol>
+                <outProtocol code="smev256">
+                    <Mnemonic>345373247</Mnemonic>
+                </outProtocol>
+            </Service>
+            <Service code="Declaration">
+                <inProtocol code="soap11"/>
+                <outProtocol code="soap11"/>
+            </Service>
+            <Service code="HelloWorld">
+                <inProtocol code="soap11"/>
+                <outProtocol code="smev256" security="security"/>
+            </Service>
+        </ServiceProtocols>
+    </WS>
+</Config>
