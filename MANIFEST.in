@@ -1,0 +1,4 @@
+include README README.rst LICENSE DESCRIPTION
+recursive-include src *
+recursive-exclude src *.pyc
+recursive-exclude src *.orig

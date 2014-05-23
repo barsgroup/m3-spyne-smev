@@ -2,3 +2,5 @@
 demo/*
 .idea/*
 src/wsfactory/schema/log/*
+dist/*
+MANIFEST
