@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 from functools import wraps, partial
 import traceback
 
+from django.conf import settings
 from django.http import Http404
 from django.views.decorators.csrf import csrf_exempt
 
@@ -28,7 +29,6 @@ def track_config(fn):
     @wraps(fn)
     def inner(*args, **kwargs):
         if not Settings.configured():
-            from django.conf import settings
             config_path = getattr(settings, "WSFACTORY_CONFIG_FILE")
             logger.info(
                 "Not configured yet. Load configuration %s" % config_path)

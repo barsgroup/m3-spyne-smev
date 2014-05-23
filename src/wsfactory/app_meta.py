@@ -13,9 +13,8 @@ import objectpack
 
 from wsfactory.urls import urlpatterns
 from wsfactory.views import track_config
-
-import actions
-from controller import controller
+from wsfactory.ui.controller import controller
+from wsfactory.ui import actions
 
 
 def register_actions():

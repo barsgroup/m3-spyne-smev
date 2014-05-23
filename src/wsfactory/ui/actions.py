@@ -15,11 +15,12 @@ from m3.actions import ControllerCache
 
 import objectpack
 
-from controller import observer
-from _helpers import get_cache
-from config import Settings
-import models
-import forms
+from wsfactory.ui.controller import observer
+from wsfactory._helpers import get_cache
+from wsfactory.config import Settings
+from wsfactory.models import LogEntry
+from wsfactory.ui import models
+from wsfactory.ui import forms
 
 
 class BaseWSPack(objectpack.ObjectPack):
@@ -188,7 +189,7 @@ class ApplicationPack(BaseWSPack):
 
 class LogPack(objectpack.ObjectPack):
 
-    model = models.LogEntry
+    model = LogEntry
 
     width = 800
     height = 600
@@ -222,7 +223,7 @@ class LogPack(objectpack.ObjectPack):
         {
             "data_index": "in_object",
             "header": _(u"Параметры запроса"),
-            "width": 2,
+            "width": 3,
         },
         {
             "data_index": "request",

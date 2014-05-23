@@ -24,7 +24,7 @@
     </Service>
   </Services>
   <SecurityProfile>
-    <Security code="security" name="Профиль по умолчанию" pem_file_name="/home/timic/Projects/bars/edu/conf/pem.pem" private_key_pass="12345678"/>
+    <Security code="security" name="Профиль по умолчанию" pem_file_name="/tmp/test_nao.pem" private_key_pass="12345678"/>
   </SecurityProfile>
   <Applications>
     <Application name="HelloWorld-soap11-smev256" service="HelloWorld">
@@ -32,10 +32,13 @@
       <OutProtocol code="smev256" security="security"/>
     </Application>
     <Application name="Test" service="HelloWorld">
-      <InProtocol code="http-rpc">
-        <Param key="parse_cookie" valueType="bool">True</Param>
-      </InProtocol>
-      <OutProtocol code="soap11"/>
+      <InProtocol code="http-rpc"/>
+      <OutProtocol code="smev256" security="security">
+        <Param key="Mnemonic" valueType="unicode">123456789</Param>
+        <Param key="RecipientName" valueType="unicode">BlaBlaBla</Param>
+        <Param key="Version" valueType="unicode">1.00</Param>
+        <Param key="RecipientCode" valueType="unicode">123456789</Param>
+      </OutProtocol>
     </Application>
     <Application name="Declaration-smev256-smev256" service="Declaration" tns="http://bars-open.ru/inf">
       <InProtocol code="smev256" security="security">

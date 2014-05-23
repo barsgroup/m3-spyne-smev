@@ -6,7 +6,9 @@ function addProtocolParamItem(clientId){
     var grid = Ext.getCmp(clientId),
         store = grid.getStore();
     store.add([
-        new store.recordType()
+        new store.recordType({
+            key: "sampleParam", "value": "sampleValue", value_type: "unicode"
+        })
     ]);
 }
 

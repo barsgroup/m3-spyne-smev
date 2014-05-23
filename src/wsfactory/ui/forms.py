@@ -163,10 +163,10 @@ class ApplicationEditWindow(objectpack.BaseEditWindow):
             name="in_protocol_params_json", hidden=True)
         self.out_protocol_param_json_field = ext.ExtStringField(
             name="out_protocol_params_json", hidden=True)
-        self.in_protocol_param_grid = _make_param_grid(
+        self.in_protocol_param_grid = self._make_param_grid(
             _(u"Параметры протокола"), self.in_protocol_param_json_field)
-        self.out_protocol_param_grid = _make_param_grid(
-            _(u"Параметры протокола"), self.in_protocol_param_json_field)
+        self.out_protocol_param_grid = self._make_param_grid(
+            _(u"Параметры протокола"), self.out_protocol_param_json_field)
 
     def _do_layout(self):
         super(ApplicationEditWindow, self)._do_layout()
@@ -217,45 +217,52 @@ class ApplicationEditWindow(objectpack.BaseEditWindow):
             params["object"].out_protocol_params_data)
         self.template_globals = "ui-js/application-edit-window.js"
 
-
-def _make_param_grid(label, json_field):
-    grid = ext.ExtObjectGrid(
-        label=label, height=140)
-    grid.add_column(
-        header=_(u"Имя"), data_index="key", editor=ext.ExtStringField())
-    grid.add_column(
-        header=_(u"Значение"), data_index="value",
-        editor=ext.ExtStringField())
-    grid.add_column(
-        header=_(u"Тип значения"), data_index="value_type",
-        editor=make_combo_box(
-            data=(
-                ("str", "str"),
-                ("unicode", "unicode"),
-                ("int", "int"),
-                ("bool", "bool"))))
-    grid.allow_paging = False
-    grid.store = ext.ExtDataStore()
-    grid.store._id_property = "key"
-    grid.editor = True
-    grid.row_id_name = "key"
-    grid.top_bar.items.extend((
-        ext.ExtButton(
-            text=_(u"Добавить"),
-            icon_cls="add_item",
-            handler="function() {addProtocolParamItem(\"%s\")}"
-                    % grid.client_id),
-        ext.ExtButton(
-            text=_(u"Удалить"),
-            icon_cls="delete_item",
-            handler="function() {deleteProtocolParamItem(\"%s\")}"
-                    % grid.client_id)
-    ))
-    grid.sm = ext.ExtGridRowSelModel()
-    grid.store._listeners["update"] = (
-        "function(store){onParamEditing(store, \"%s\")}"
-        % json_field.client_id)
-    return grid
+    @staticmethod
+    def _make_param_grid(label, json_field):
+        grid = ext.ExtObjectGrid(
+            label=label, height=140)
+        grid.add_column(
+            header=_(u"Имя"), data_index="key",
+            editor=ext.ExtStringField(allow_blank=False))
+        grid.add_column(
+            header=_(u"Значение"), data_index="value",
+            editor=ext.ExtStringField(allow_blank=False))
+        grid.add_column(
+            header=_(u"Тип значения"), data_index="value_type",
+            editor=make_combo_box(
+                allow_blank=False,
+                data=(
+                    ("str", "str"),
+                    ("unicode", "unicode"),
+                    ("int", "int"),
+                    ("bool", "bool"))))
+        grid.allow_paging = False
+        grid.store = ext.ExtDataStore()
+        grid.store._id_property = "key"
+        grid.editor = True
+        grid.row_id_name = "key"
+        grid.top_bar.items.extend((
+            ext.ExtButton(
+                text=_(u"Добавить"),
+                icon_cls="add_item",
+                handler="function() {addProtocolParamItem(\"%s\")}"
+                        % grid.client_id),
+            ext.ExtButton(
+                text=_(u"Удалить"),
+                icon_cls="delete_item",
+                handler="function() {deleteProtocolParamItem(\"%s\")}"
+                        % grid.client_id)
+        ))
+        grid.sm = ext.ExtGridRowSelModel()
+        handler = (
+            "function(store){onParamEditing(store, \"%s\")}"
+            % json_field.client_id)
+        grid.store._listeners.update({
+            "update": handler,
+            "add": handler,
+            "remove": handler,
+        })
+        return grid
 
 
 def container(*items, **params):

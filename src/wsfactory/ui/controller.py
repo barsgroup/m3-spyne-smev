@@ -11,4 +11,4 @@ import objectpack
 
 observer = objectpack.observer.Observer()
 controller = objectpack.observer.ObservableController(
-    url='wsfactory', observer=observer)
+    url='wsfactory/ui', observer=observer)
