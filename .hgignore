@@ -1,3 +1,4 @@
 \.pyc$
 demo/*
 .idea/*
+src/wsfactory/schema/log/*

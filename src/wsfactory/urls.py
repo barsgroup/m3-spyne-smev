@@ -11,8 +11,5 @@ from django.conf.urls import patterns, url
 urlpatterns = patterns(
     'wsfactory.views',
     url(r'^wsfactory/api$', 'api_list'),
-    url(r'^wsfactory/api/(?P<Service>.*)/(?P<InProto>.*)/(?P<OutProto>.*)$',
-        'handle_api_call'),
-    url(r'^wsfactory/api/(?P<Service>.*)/(?P<InProto>.*)$',
-        'handle_api_call'),
+    url(r'^wsfactory/api/(?P<service>.*)/.*$', 'handle_api_call'),
 )

@@ -15,12 +15,10 @@ class AllYourInterfaceDocuments(object):
     def __init__(self, interface):
 
         interface_document_type = getattr(
-            interface.app.in_protocol, '_interface_document_type',
-            None)
-        if interface_document_type:
-            self.wsdl11 = interface_document_type(interface)
-        else:
-            self.wsdl11 = Wsdl11(interface)
+            interface.app.in_protocol,
+            '_interface_document_type',
+            Wsdl11)
+        self.wsdl11 = interface_document_type(interface)
 
 
 class WSFactoryApplication(DjangoApplication):
