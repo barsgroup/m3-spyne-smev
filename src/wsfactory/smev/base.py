@@ -164,6 +164,7 @@ class BaseSmev(Soap11WSSE):
             self.construct_smev_envelope(ctx, message)
 
     def _validate_smev_element(self, element):
+        return
         self._smev_schema = self._smev_schema or load_schema(
             self._smev_schema_path)
         if not self._smev_schema.validate(element):

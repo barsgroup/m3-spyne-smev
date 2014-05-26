@@ -13,7 +13,6 @@ from importlib import import_module
 from StringIO import StringIO
 from lxml import etree
 
-from spyne.application import Application
 from spyne.service import ServiceBase
 
 
@@ -68,13 +67,8 @@ def load_schema(schema_path):
     return schema
 
 
-def logger_handler(ctx):
-
-    import ipdb; ipdb.set_trace()
-
-
 def create_application(name, tns, service, in_protocol, out_protocol):
-    from wsfactory._application import WSFactoryApplication
+    from wsfactory._application import WSFactoryApplication, Application
 
     app = Application(
         [service], tns,

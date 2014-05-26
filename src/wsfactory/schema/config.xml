@@ -50,10 +50,8 @@
       </OutProtocol>
     </Application>
     <Application name="Declaration" service="Declaration">
-      <InProtocol code="soap11">
-        <Param key="pretty_print" valueType="bool">True</Param>
-      </InProtocol>
-      <OutProtocol code="soap11"/>
+      <InProtocol code="smev256"/>
+      <OutProtocol code="smev256"/>
     </Application>
   </Applications>
 </WSConfig>

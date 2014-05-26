@@ -12,12 +12,10 @@ logger = logging.getLogger(__name__)
 import datetime
 import os
 import uuid
-from functools import partial
 
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.db import models
-from django.db.models.base import ModelBase
 from django.utils.translation import ugettext as _
 
 from wsfactory.config import Settings
@@ -31,25 +29,10 @@ def upload_handler(instance, filename):
         "%s.log" % uuid.uuid4().hex)
 
 
-class LogModelBase(ModelBase):
-
-    def __new__(cls, name, bases, attrs):
-
-        self = super(LogModelBase, cls).__new__(cls, name, bases, attrs)
-
-        for attr in ("request", "response", "traceback"):
-            setattr(self, attr, property(
-                partial(self._get_file_field_url, field=attr),
-                partial(self._set_file_field, field=attr)))
-
-        return self
-
-
 class LogEntry(models.Model):
     """
     Лог запросов к сервисам
     """
-    __metaclass__ = LogModelBase
 
     time = models.DateTimeField(
         verbose_name=_(u"Время выполнения запроса"),
@@ -92,3 +75,27 @@ class LogEntry(models.Model):
     def _set_file_field(self, value, field=None):
         getattr(self, "_".join((field, "file"))).save(
             name=".".join((field, "log")), content=ContentFile(value))
+
+    @property
+    def request(self):
+        return self._get_file_field_url("request")
+
+    @request.setter
+    def request(self, value):
+        self._set_file_field(value, "request")
+
+    @property
+    def response(self):
+        return self._get_file_field_url("response")
+
+    @response.setter
+    def response(self, value):
+        self._set_file_field(value, "response")
+
+    @property
+    def traceback(self):
+        return self._get_file_field_url("traceback")
+
+    @traceback.setter
+    def traceback(self, value):
+        self._set_file_field(value, "traceback")

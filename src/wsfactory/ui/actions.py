@@ -236,7 +236,7 @@ class LogPack(objectpack.ObjectPack):
             "width": 1,
         },
         {
-            "data_index": "request",
+            "data_index": "traceback",
             "header": _(u"Трассировка ошибки"),
             "width": 1,
         }
