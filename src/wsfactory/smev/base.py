@@ -243,7 +243,6 @@ class BaseSmevWsdl(Wsdl11):
         tns_schema.getparent().replace(tns_schema, new_tns_schema)
 
         self._add_smev_headers(self.root_elt)
-        import ipdb; ipdb.set_trace()
         self._Wsdl11__wsdl = etree.tostring(
             self.root_elt, encoding='UTF-8')
 
