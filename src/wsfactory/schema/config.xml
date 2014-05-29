@@ -51,11 +51,11 @@
       </OutProtocol>
     </Application>
     <Application name="DeclSoap" service="Declaration">
-      <InProtocol code="soap11wsse"/>
-      <OutProtocol code="soap11wsse"/>
+      <InProtocol code="soap11wsse" security="security"/>
+      <OutProtocol code="soap11wsse" security="security"/>
     </Application>
     <Application name="Declaration" service="Declaration">
-      <InProtocol code="smev256"/>
+      <InProtocol code="smev256" security="security"/>
       <OutProtocol code="smev256" security="security"/>
     </Application>
   </Applications>

@@ -220,7 +220,7 @@ class BaseSmevWsdl(Wsdl11):
     def build_interface_document(self, url):
         super(BaseSmevWsdl, self).build_interface_document(url)
         smev_schema = self._get_smev_schema().getroot()
-
+        smev_schema = copy_with_nsmap(smev_schema, dict(tns=self._ns["tns"]))
         messages = self.root_elt.xpath(
             "./wsdl:portType/wsdl:operation/wsdl:input/@message | "
             "./wsdl:portType/wsdl:operation/wsdl:output/@message",
@@ -243,7 +243,7 @@ class BaseSmevWsdl(Wsdl11):
         tns_schema.getparent().replace(tns_schema, new_tns_schema)
 
         self._add_smev_headers(self.root_elt)
-
+        import ipdb; ipdb.set_trace()
         self._Wsdl11__wsdl = etree.tostring(
             self.root_elt, encoding='UTF-8')
 
