@@ -68,7 +68,7 @@ def load_schema(schema_path):
 
 
 def create_application(name, tns, service, in_protocol, out_protocol):
-    from wsfactory._application import WSFactoryApplication, Application
+    from wsfactory.application import WSFactoryApplication, Application
 
     app = Application(
         [service], tns,

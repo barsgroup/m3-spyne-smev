@@ -55,7 +55,7 @@ def api_list(request):
 
 
 def handle_wsgi_close(ctx, log=None):
-    log.api = ctx.method_name
+    log.api = ctx.method_name or "unknown"
     log.in_object = unicode(ctx.in_object or "") or None
 
 
@@ -67,7 +67,6 @@ def handle_exception(e, log=None):
 def handle_api_call(request, service):
     service_handler = Settings.get_service_handler(service)
     if service_handler:
-
         logger.debug("Hitting service %s." % service)
         log = LogEntry(
             url="%s %s" % (request.method, request.get_full_path()),
@@ -77,8 +76,6 @@ def handle_api_call(request, service):
         request.META["wsgi.input"] = StringIO(request_body)
         request._stream = LimitedStream(
             request.META["wsgi.input"], request._stream.remaining)
-        if request_body:
-            log.request = request_body
         service_handler.event_manager.add_listener(
             "wsgi_close", partial(handle_wsgi_close, log=log))
         service_handler.app.event_manager.add_listener(
@@ -93,6 +90,8 @@ def handle_api_call(request, service):
             if response.content:
                 log.response = response.content
         finally:
+            if request_body:
+                log.request = request_body
             log.save()
             service_handler.event_manager = EventManager(service_handler)
             service_handler.app.event_manager = EventManager(

@@ -22,6 +22,7 @@ from libsmev.signer import (
 from wsfactory._helpers import load_schema, load_xml
 from wsfactory.smev import xmlns as ns
 from wsfactory.smev.helpers import Cap, copy_with_nsmap
+from wsfactory.application import ApiError
 
 
 class WSSecurity(object):
@@ -100,6 +101,21 @@ class Soap11WSSE(Soap11):
             ctx.out_document = self.wsse_security.apply(ctx.out_document)
         super(Soap11WSSE, self).create_out_string(ctx, charset)
 
+    def to_parent_element(self, cls, value, tns, parent_elt, *args, **kwargs):
+        if issubclass(cls, ApiError):
+            message = etree.SubElement(
+                parent_elt, "{%s}%s" % (tns, value.messageName))
+            error = etree.SubElement(message, "{%s}%s" % (tns, "Error"))
+            etree.SubElement(
+                error, "{%s}%s" % (tns, "errorCode")
+            ).text = value.errorCode
+            etree.SubElement(
+                error, "{%s}%s" % (tns, "errorMessage")
+            ).text = value.errorMessage
+        else:
+            super(Soap11WSSE, self).to_parent_element(
+                cls, value, tns, parent_elt, *args, **kwargs)
+
 
 class BaseSmev(Soap11WSSE):
     """
@@ -160,11 +176,11 @@ class BaseSmev(Soap11WSSE):
 
     def serialize(self, ctx, message):
         super(BaseSmev, self).serialize(ctx, message)
-        if ctx.out_error is None:
+        if ctx.out_error is None or issubclass(
+                ctx.out_error.__class__, ApiError):
             self.construct_smev_envelope(ctx, message)
 
     def _validate_smev_element(self, element):
-        return
         self._smev_schema = self._smev_schema or load_schema(
             self._smev_schema_path)
         if not self._smev_schema.validate(element):

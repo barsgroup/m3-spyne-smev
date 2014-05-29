@@ -98,7 +98,8 @@ class Settings(object):
 
         if not os.path.exists(config_path):
             raise ImproperlyConfigured(
-                "Configuration file does not exist!")
+                "Configuration file `%s` does not exist!"
+                % config_path)
 
         xml = load_xml(config_path)
         cls.validate(xml)

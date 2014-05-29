@@ -4,3 +4,4 @@ demo/*
 src/wsfactory/schema/log/*
 dist/*
 MANIFEST
+src/wsfactory/schema/config.xml

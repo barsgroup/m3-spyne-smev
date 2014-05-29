@@ -19,10 +19,9 @@ class Command(BaseCommand):
 
     args = "< path >"
 
-    def handle(self, path, *args, **options):
-
+    def handle(self, path="./", *args, **options):
         config_path = os.path.join(os.path.dirname(
-            wsfactory.__file__), "schema", "config.xml")
+            wsfactory.__file__), "schema", "base_config.xml")
         shutil.copy(config_path, path)
         print "OK!"
 

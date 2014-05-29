@@ -10,8 +10,11 @@
     </Protocol>
   </Protocols>
   <ApiRegistry>
+    <Api code="GetGrade" module="web_edu.core.declaration.wsapi.GetGrade" name="Получить список классов"/>
     <Api code="CreateOrderOU" module="web_edu.core.declaration.wsapi.CreateOrderOU" name="Подать заявление"/>
     <Api code="SayHello" module="web_edu.core.declaration.wsapi.SayHello" name="Привет!"/>
+    <Api code="GetSpecialization" module="web_edu.core.declaration.wsapi.GetSpecialization" name="Получить список специализаций"/>
+    <Api code="GetYear" module="web_edu.core.declaration.wsapi.GetYear" name="Получить список уровней обучения"/>
     <Api code="GetOU" module="web_edu.core.declaration.wsapi.GetOU" name="Получить список учреждений"/>
   </ApiRegistry>
   <Services>
@@ -19,8 +22,11 @@
       <Api code="SayHello"/>
     </Service>
     <Service code="Declaration" name="Услуга подачи заявления на ЕПГУ">
+      <Api code="GetYear"/>
       <Api code="CreateOrderOU"/>
       <Api code="GetOU"/>
+      <Api code="GetSpecialization"/>
+      <Api code="GetGrade"/>
     </Service>
   </Services>
   <SecurityProfile>
@@ -32,13 +38,8 @@
       <OutProtocol code="smev256" security="security"/>
     </Application>
     <Application name="Test" service="HelloWorld">
-      <InProtocol code="http-rpc"/>
-      <OutProtocol code="smev256" security="security">
-        <Param key="Mnemonic" valueType="unicode">123456789</Param>
-        <Param key="RecipientName" valueType="unicode">BlaBlaBla</Param>
-        <Param key="Version" valueType="unicode">1.00</Param>
-        <Param key="RecipientCode" valueType="unicode">123456789</Param>
-      </OutProtocol>
+      <InProtocol code="soap11"/>
+      <OutProtocol code="soap11"/>
     </Application>
     <Application name="Declaration-smev256-smev256" service="Declaration" tns="http://bars-open.ru/inf">
       <InProtocol code="smev256" security="security">
@@ -49,9 +50,13 @@
         <Param key="Mnemonic" valueType="unicode">345373247</Param>
       </OutProtocol>
     </Application>
+    <Application name="DeclSoap" service="Declaration">
+      <InProtocol code="soap11wsse"/>
+      <OutProtocol code="soap11wsse"/>
+    </Application>
     <Application name="Declaration" service="Declaration">
       <InProtocol code="smev256"/>
-      <OutProtocol code="smev256"/>
+      <OutProtocol code="smev256" security="security"/>
     </Application>
   </Applications>
 </WSConfig>
