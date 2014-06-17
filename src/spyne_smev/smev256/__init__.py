@@ -6,13 +6,13 @@
 """
 import datetime
 import os
-from lxml import etree
 
+from lxml import etree
 from spyne.protocol.xml.model import complex_from_element
 
-from wsfactory.smev import xmlns as ns
-from wsfactory.smev.base import BaseSmev, BaseSmevWsdl
-from wsfactory.smev.helpers import Cap, el_name_with_ns
+from .._base import BaseSmev, BaseSmevWsdl
+from .._utils import Cap, el_name_with_ns
+from spyne_smev import _xmlns as ns
 
 from model import MessageType, ServiceType, HeaderType, AppDocument
 
@@ -37,7 +37,7 @@ class Smev256(BaseSmev):
     def construct_smev_envelope(self, ctx, message):
         smev_message = self._create_message_element(ctx)
         message_data = self._create_message_data_element(ctx)
-        app_data = message_data.find("./{%(smev)s}AppData" % self._ns)
+        app_data = message_data.find("./{%(spyne_smev)s}AppData" % self._ns)
         body_response = ctx.out_body_doc.getchildren()[0]
         app_data.extend(body_response.getchildren())
         body_response.clear()
@@ -66,7 +66,7 @@ class Smev256(BaseSmev):
 
     def _create_message_element(self, ctx):
         """
-        Констрирует болванку для smev:Message
+        Констрирует болванку для spyne_smev:Message
 
         :param ctx: Сквозной контекст метода
         :rtype: lxml.etree.Element
@@ -76,9 +76,9 @@ class Smev256(BaseSmev):
         if not getattr(ctx.udc, 'out_smev_message', None):
             ctx.udc.out_smev_object = Cap()
 
-        SMEV = el_name_with_ns(self._ns['smev'])
+        SMEV = el_name_with_ns(self._ns['spyne_smev'])
 
-        root = etree.Element(SMEV('Message'), nsmap={'smev': self._ns['smev']})
+        root = etree.Element(SMEV('Message'), nsmap={'spyne_smev': self._ns['spyne_smev']})
         sender = etree.SubElement(root, SMEV('Sender'))
         etree.SubElement(sender, SMEV('Code')).text = (
             ctx.udc.out_smev_message.Sender.Code
@@ -139,9 +139,9 @@ class Smev256(BaseSmev):
 
         :rtype: lxml.etree.Element
         """
-        SMEV = el_name_with_ns(self._ns['smev'])
+        SMEV = el_name_with_ns(self._ns['spyne_smev'])
 
-        root = etree.Element(SMEV('MessageData'), nsmap={'smev': self._ns['smev']})
+        root = etree.Element(SMEV('MessageData'), nsmap={'spyne_smev': self._ns['spyne_smev']})
         etree.SubElement(root, SMEV('AppData'))
         if ctx.udc.out_smev_appdoc.BinaryData:
             app_document = etree.SubElement(root, SMEV('AppDocument'))

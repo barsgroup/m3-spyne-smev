@@ -1,0 +1,219 @@
+# -*- coding: utf-8 -*-
+
+"""
+_crypto.py
+
+:Created: 6/9/14
+:Author: timic
+"""
+
+from functools import partial as _partial
+
+from cryptography.hazmat.bindings.openssl.binding import Binding as _Binding
+
+import _utils
+
+_binding = _Binding()
+_lib, _ffi = _binding.lib, _binding.ffi
+_openssl_configured = False
+if not _openssl_configured:
+    _lib.OPENSSL_config(_ffi.NULL)
+    _openssl_configured = True
+
+
+class InvalidSignature(Exception):
+    """
+    An error occurred if message signature
+    """
+
+
+class Error(Exception):
+    """
+    An error occurred in an `libcrypto` API.
+    """
+
+
+def _exception_from_error_queue(exception_type):
+    def text(charp):
+        return _utils.native(_ffi.string(charp))
+
+    errors = []
+    while True:
+        error = _lib.ERR_get_error()
+        if error == 0:
+            break
+        errors.append((
+            text(_lib.ERR_lib_error_string(error)),
+            text(_lib.ERR_func_error_string(error)),
+            text(_lib.ERR_reason_error_string(error))))
+
+    raise exception_type(errors)
+
+_raise_current_error = _partial(_exception_from_error_queue, Error)
+
+
+def get_text_digest(text, digest_name="md_gost94"):
+    """
+    Returns Base64 encoded digest value for given text.
+
+    :param basestring text: Text for digest processing
+    :param str digest_name: Digest algorithm name
+    :return str: text digest
+    """
+    evp_md = _lib.EVP_get_digestbyname(digest_name)
+
+    if evp_md == _ffi.NULL:
+        raise ValueError("No such digest method")
+
+    evp_md_ctx = _lib.EVP_MD_CTX_create()
+    if _lib.EVP_DigestInit_ex(evp_md_ctx, evp_md, _ffi.NULL) == 0:
+        _raise_current_error()
+
+    input_buffer = _utils.byte_string(text)
+
+    if _lib.EVP_DigestUpdate(evp_md_ctx, input_buffer, len(input_buffer)) == 0:
+        _raise_current_error()
+
+    result_buf = _ffi.new("char[]", _lib.EVP_MAX_MD_SIZE)
+    result_len = _ffi.new("unsigned int[]", 1)
+    result_len[0] = len(result_buf)
+    if _lib.EVP_DigestFinal_ex(evp_md_ctx, result_buf, result_len) == 0:
+        _raise_current_error()
+
+    _lib.EVP_MD_CTX_destroy(evp_md_ctx)
+
+    return b"".join(_ffi.buffer(result_buf, result_len[0]))
+
+
+def sign(
+        data, private_key_data, private_key_pass=_ffi.NULL,
+        digest_name="md_gost94"):
+    """
+    :param unicode data: Data to sign
+    :param unicode private_key_data: Private key
+    :param unicode private_key_pass: Private key's passphrase
+    :param str digest_name: Message digest method
+    :return unicode: Signature
+    """
+    pkey = _load_private_key(private_key_data, private_key_pass)
+
+    md = _lib.EVP_get_digestbyname(_utils.byte_string(digest_name))
+    if md == _ffi.NULL:
+        raise ValueError("No such digest method")
+
+    md_ctx = _ffi.new("EVP_MD_CTX*")
+    md_ctx = _ffi.gc(md_ctx, _lib.EVP_MD_CTX_cleanup)
+
+    if _lib.EVP_SignInit(md_ctx, md) != 1:
+        _raise_current_error()
+    if _lib.EVP_SignUpdate(md_ctx, data, len(data)) != 1:
+        _raise_current_error()
+
+    signature_buffer = _ffi.new("unsigned char[]", 512)
+    signature_length = _ffi.new("unsigned int*")
+    signature_length[0] = len(signature_buffer)
+    final_result = _lib.EVP_SignFinal(
+        md_ctx, signature_buffer, signature_length, pkey)
+
+    if final_result != 1:
+        _raise_current_error()
+
+    return _ffi.buffer(signature_buffer, signature_length[0])[:]
+
+
+def verify(text, cert_data, signature, digest_name="md_gost94"):
+    """
+    :param basestring text:
+    :param basestring cert_data:
+    :param basestring signature:
+    :param str digest_name:
+    :raises: ValueError, InvalidSignature
+    """
+    md = _lib.EVP_get_digestbyname(_utils.byte_string(digest_name))
+
+    if md == _ffi.NULL:
+        raise ValueError("No such digest method")
+
+    md_ctx = _ffi.new("EVP_MD_CTX*")
+    md_ctx = _ffi.gc(md_ctx, _lib.EVP_MD_CTX_cleanup)
+
+    if _lib.EVP_VerifyInit(md_ctx, md) == 0:
+        _raise_current_error()
+
+    if _lib.EVP_VerifyUpdate(md_ctx, text, len(text)) == 0:
+        _raise_current_error()
+
+    cert = _load_certificate(cert_data)
+    pkey = _get_cert_pub_key(cert)
+    if pkey == _ffi.NULL:
+        _raise_current_error()
+
+    pkey = _ffi.gc(pkey, _lib.EVP_PKEY_free)
+
+    result = _lib.EVP_VerifyFinal(
+        md_ctx, signature, len(signature), pkey)
+
+    if result == -1:
+        _raise_current_error()
+    elif result == 0:
+        raise InvalidSignature("Invalid signature")
+
+
+def _new_mem_buf(buf=None):
+
+    if buf is None:
+        bio = _lib.BIO_new(_lib.BIO_s_mem())
+        free = _lib.BIO_free
+    else:
+        data = _ffi.new("char[]", buf)
+        bio = _lib.BIO_new_mem_buf(data, len(buf))
+
+        def free(bio, ref=data):
+            return _lib.BIO_free(bio)
+
+    if bio == _ffi.NULL:
+        _raise_current_error()
+
+    bio = _ffi.gc(bio, free)
+
+    return bio
+
+
+def _load_certificate(buf):
+
+    if isinstance(buf, _utils.text_type):
+        buf = buf.encode("ascii")
+
+    bio = _new_mem_buf(buf)
+    x509 = _lib.PEM_read_bio_X509(bio, _ffi.NULL, _ffi.NULL, _ffi.NULL)
+
+    if x509 == _ffi.NULL:
+        _raise_current_error()
+
+    return _ffi.gc(x509, _lib.X509_free)
+
+
+def _get_cert_pub_key(x509):
+
+    pkey = _lib.X509_get_pubkey(x509)
+
+    if pkey == _ffi.NULL:
+        _raise_current_error()
+
+    return _ffi.gc(pkey, _lib.EVP_PKEY_free)
+
+
+def _load_private_key(pem_buffer, pass_phrase=_ffi.NULL):
+
+    if isinstance(pem_buffer, _utils.text_type):
+        pem_buffer = pem_buffer.encode("ascii")
+
+    bio = _new_mem_buf(pem_buffer)
+
+    evp_pkey = _lib.PEM_read_bio_PrivateKey(
+        bio, _ffi.NULL, _ffi.NULL, pass_phrase)
+
+    if evp_pkey == _ffi.NULL:
+        _raise_current_error()
+
+    return _ffi.gc(evp_pkey, _lib.EVP_PKEY_free)

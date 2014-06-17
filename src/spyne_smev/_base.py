@@ -1,120 +1,60 @@
 # -*- coding: utf-8 -*-
 
 """
-base.py
+_base.py
 
 :Created: 5/13/14
 :Author: timic
 """
 import logging
+
+from spyne_smev import _xmlns as ns
+
+
 logger = logging.getLogger(__name__)
 
 from lxml import etree
-from copy import deepcopy
 
-from spyne.protocol.soap.soap11 import Soap11
 from spyne.interface.wsdl.wsdl11 import Wsdl11
 from spyne.model.fault import Fault
 
-from libsmev.signer import (
-    verify_envelope_signature, SignerError, sign_document)
-
-from wsfactory._helpers import load_schema, load_xml
-from wsfactory.smev import xmlns as ns
-from wsfactory.smev.helpers import Cap, copy_with_nsmap
-from wsfactory.application import ApiError
+from _utils import load_schema, load_xml, Cap, copy_with_nsmap
+from wsse import Soap11WSSE
 
 
-class WSSecurity(object):
-
-    def __init__(self, pem_file_name, private_key_pass):
-        self.pem_file_name = pem_file_name
-        self.private_key_pass = private_key_pass
-
-    def apply(self, envelope):
-        """
-        Применяет профиль безопасности к конверту SOAP
-
-        :param envelope: Soap конверт
-        :return: Soap envelope with applied security
-        """
-        logger.info("Attempt to sign document with key file %s"
-                    % self.pem_file_name)
-        unsigned = deepcopy(envelope)
-        try:
-            return sign_document(
-                envelope, self.pem_file_name,
-                self.private_key_pass, self.pem_file_name)
-        except ValueError, e:
-            logger.error(
-                "Error occurred while signing document:\n%s\n"
-                "Keep it unsigned ..." % e.message)
-            return unsigned
-
-    def validate(self, envelope):
-        """
-        Проверяем, удовлетворяет ли конверт требованиям безопасности
-
-        :param envelope: Soap конверт
-        :raises: spyne.model.fault.Fault
-        """
-        is_valid = False
-        logger.info("Validate signed document")
-        try:
-            is_valid = verify_envelope_signature(envelope)
-        except SignerError:
-            logger.error("Fault! Invalid signature.")
-
-        if not is_valid:
-            raise Fault(
-                'SMEV-100003', 'Invalid signature!')
-
-
-class Soap11WSSE(Soap11):
+class ApiError(Fault):
     """
-    Протокол SOAP с поддержкой WS-Security
+    Специальный exception, который может быть возбужден в api-методе.
 
-    :param wsse_security: Объек WS-Security
-    :type wsse_security: wsfactory.smev.security.BaseWSSecurity
+    Специальным образом обрабатывается в потомках исходящего протокола
+    Soap11WSSE: вместо Fault в body soap-конверта кладется вызываемый
+    soap-message c элементом Error внутри.
+
+    В остальных протоколах вёдет себя как обычный Fault
+
+    TODO: пока необходимо явно передавать имя api-метода в котором возбуждается
+    исключение
     """
+
+    detail = None
+    faultactor = "Server"
 
     def __init__(
-        self, app=None, validator=None, xml_declaration=True,
-        cleanup_namespaces=True, encoding='UTF-8', pretty_print=False,
-        wsse_security=None,
-    ):
-        self.wsse_security = wsse_security
-        if self.wsse_security:
-            pretty_print = False
-        super(Soap11WSSE, self).__init__(
-            app, validator, xml_declaration,
-            cleanup_namespaces, encoding, pretty_print)
+            self, errorCode, errorMessage, messageName):
+        self.errorCode = errorCode
+        self.errorMessage = errorMessage
+        self.messageName = messageName
 
-    def create_in_document(self, ctx, charset=None):
-        super(Soap11WSSE, self).create_in_document(ctx, charset)
-        if self.wsse_security:
-            in_document, _ = ctx.in_document
-            self.wsse_security.validate(in_document)
+    @property
+    def faultcode(self):
+        return self.errorCode
 
-    def create_out_string(self, ctx, charset=None):
-        if self.wsse_security:
-            ctx.out_document = self.wsse_security.apply(ctx.out_document)
-        super(Soap11WSSE, self).create_out_string(ctx, charset)
+    @property
+    def faultstring(self):
+        return self.errorMessage
 
-    def to_parent_element(self, cls, value, tns, parent_elt, *args, **kwargs):
-        if issubclass(cls, ApiError):
-            message = etree.SubElement(
-                parent_elt, "{%s}%s" % (tns, value.messageName))
-            error = etree.SubElement(message, "{%s}%s" % (tns, "Error"))
-            etree.SubElement(
-                error, "{%s}%s" % (tns, "errorCode")
-            ).text = value.errorCode
-            etree.SubElement(
-                error, "{%s}%s" % (tns, "errorMessage")
-            ).text = value.errorMessage
-        else:
-            super(Soap11WSSE, self).to_parent_element(
-                cls, value, tns, parent_elt, *args, **kwargs)
+    def __repr__(self):
+        return u"Error(%s: %s)" % (self.errorCode, self.errorMessage)
 
 
 class BaseSmev(Soap11WSSE):
@@ -148,13 +88,13 @@ class BaseSmev(Soap11WSSE):
         if ctx.udc is None:
             ctx.udc = Cap()
         ctx.udc.in_smev_header_document = in_document.find(
-            ".//{%(smev)s}Header" % self._ns)
+            ".//{%(spyne_smev)s}Header" % self._ns)
         ctx.udc.in_smev_message_document = in_document.find(
-            ".//{%(smev)s}Message" % self._ns)
+            ".//{%(spyne_smev)s}Message" % self._ns)
         ctx.udc.in_smev_appdoc_document = in_document.find(
-            ".//{%(smev)s}AppDocument" % self._ns)
+            ".//{%(spyne_smev)s}AppDocument" % self._ns)
         message_data = in_document.find(
-            ".//{%(smev)s}MessageData" % self._ns)
+            ".//{%(spyne_smev)s}MessageData" % self._ns)
         if not all((ctx.udc.in_smev_message_document, message_data)):
             raise Fault("SMEV-100010", "Invalid configuration!")
         map(self._validate_smev_element, filter(bool, (
@@ -162,7 +102,7 @@ class BaseSmev(Soap11WSSE):
             ctx.udc.in_smev_header_document,
             message_data)))
         method_data = message_data.find(
-            ".//{%(smev)s}AppData" % self._ns).getchildren()
+            ".//{%(spyne_smev)s}AppData" % self._ns).getchildren()
         method = in_document.find(
             ".//{%s}Body" % ns.soapenv).getchildren()[0]
         method.clear()
@@ -190,6 +130,21 @@ class BaseSmev(Soap11WSSE):
                 "SMEV-102000",
                 "Message didn't pass validation checks! Errors:\n%s" % errors)
 
+    def to_parent_element(self, cls, value, tns, parent_elt, *args, **kwargs):
+        if issubclass(cls, ApiError):
+            message = etree.SubElement(
+                parent_elt, "{%s}%s" % (tns, value.messageName))
+            error = etree.SubElement(message, "{%s}%s" % (tns, "Error"))
+            etree.SubElement(
+                error, "{%s}%s" % (tns, "errorCode")
+            ).text = value.errorCode
+            etree.SubElement(
+                error, "{%s}%s" % (tns, "errorMessage")
+            ).text = value.errorMessage
+        else:
+            super(BaseSmev, self).to_parent_element(
+                cls, value, tns, parent_elt, *args, **kwargs)
+
     def construct_smev_envelope(self, ctx, message):
         """
         Оборачивает soap-конверт в СМЭВ-сообщение
@@ -210,7 +165,7 @@ class BaseSmevWsdl(Wsdl11):
     def __init__(self, interface=None, _with_partnerlink=False):
         super(BaseSmevWsdl, self).__init__(interface, _with_partnerlink)
         self._ns = self.interface.nsmap.copy()
-        self._ns.update({'smev': self.smev_ns})
+        self._ns.update({'spyne_smev': self.smev_ns})
 
     def _get_smev_schema(self):
         self.__smev_schema = self.__smev_schema or load_xml(
@@ -232,12 +187,12 @@ class BaseSmevWsdl(Wsdl11):
         tns_schema = self.root_elt.find(
             "./{%(wsdl)s}types/{%(xs)s}schema[@targetNamespace='%(tns)s']"
             % self._ns)
-        new_tns_schema = copy_with_nsmap(tns_schema, {'smev': self.smev_ns})
+        new_tns_schema = copy_with_nsmap(tns_schema, {'spyne_smev': self.smev_ns})
 
         for _, message in messages:
             element = new_tns_schema.find(
                 './/{%s}element[@name="%s"]' % (ns.xs, message))
-            element.attrib['type'] = 'smev:%sType' % message
+            element.attrib['type'] = 'spyne_smev:%sType' % message
 
         self.root_elt.find("./{%s}types" % ns.wsdl).insert(0, smev_schema)
         tns_schema.getparent().replace(tns_schema, new_tns_schema)
@@ -253,7 +208,7 @@ class BaseSmevWsdl(Wsdl11):
         seq = etree.SubElement(root, "{%(xs)s}sequence" % self._ns)
         etree.SubElement(
             seq, "{%(xs)s}element" % ns.nsmap256,
-            name="Message", type="smev:MessageType")
+            name="Message", type="spyne_smev:MessageType")
         message_data = etree.SubElement(
             seq, "{%(xs)s}element" % ns.nsmap256, name="MessageData")
         complex_type = etree.SubElement(
@@ -264,7 +219,7 @@ class BaseSmevWsdl(Wsdl11):
             name="AppData", type="tns:%s" % message, minOccurs="0")
         etree.SubElement(
             seq, "{%(xs)s}element" % self._ns,
-            name="AppDocument", type="smev:AppDocumentType", minOccurs="0")
+            name="AppDocument", type="spyne_smev:AppDocumentType", minOccurs="0")
         return root
 
     def _add_smev_headers(self, wsdl):
@@ -281,8 +236,8 @@ class BaseSmevWsdl(Wsdl11):
 
         etree.SubElement(
             header_message, "{%(wsdl)s}part" % self._ns,
-            nsmap={'smev': self.smev_ns},
-            name="SmevHeader", element="smev:Header")
+            nsmap={'spyne_smev': self.smev_ns},
+            name="SmevHeader", element="spyne_smev:Header")
 
         for operation in operations:
             binding = operation.getparent().getparent().find(
@@ -293,7 +248,7 @@ class BaseSmevWsdl(Wsdl11):
                 binding['style'] = 'rpc'
             etree.SubElement(
                 operation, "{%(soap)s}header" % self._ns,
-                nsmap={'smev': self.smev_ns},
+                nsmap={'spyne_smev': self.smev_ns},
                 message='tns:SmevHeader',
                 part='SmevHeader',
                 use='literal')

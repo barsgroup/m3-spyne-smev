@@ -10,8 +10,8 @@ models.py
 from spyne.model.primitive import Unicode, Integer, DateTime
 from spyne.model.binary import File, BINARY_ENCODING_BASE64
 
-from wsfactory.utils import namespace
-from wsfactory.smev.xmlns import smev256
+from .._utils import namespace
+from .._xmlns import smev256
 
 SmevModel = namespace(smev256)
 

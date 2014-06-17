@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 
 """
-xmlns.py
+_xmlns.py
 
 :Created: 3/13/14
 :Author: timic
 """
 
-smev245 = "http://smev.gosuslugi.ru/rev111111"
-smev256 = "http://smev.gosuslugi.ru/rev120315"
-inf = "http://smev.gosuslugi.ru/inf"
+smev245 = "http://spyne_smev.gosuslugi.ru/rev111111"
+smev256 = "http://spyne_smev.gosuslugi.ru/rev120315"
+inf = "http://spyne_smev.gosuslugi.ru/inf"
 soapenv = "http://schemas.xmlsoap.org/soap/envelope/"
 wsdl = "http://schemas.xmlsoap.org/wsdl/"
 soap = "http://schemas.xmlsoap.org/wsdl/soap/"
@@ -25,6 +25,12 @@ gostr3410 = "http://www.w3.org/2001/04/xmldsig-more#gostr34102001-gostr3411"
 gostr3411hash = "http://www.w3.org/2001/04/xmldsig-more#gostr3411"
 c14n = "http://www.w3.org/2001/10/xml-exc-c14n#"
 xs = "http://www.w3.org/2001/XMLSchema"
+base64enc = (
+    "http://docs.oasis-open.org/wss/2004/01"
+    "/oasis-200401-wss-soap-message-security-1.0#Base64Binary")
+x509_token_profile = (
+    "http://docs.oasis-open.org/wss/2004/01/"
+    "oasis-200401-wss-x509-token-profile-1.0#X509v3")
 
 _nsmap = {
     'xs': xs,
@@ -37,7 +43,7 @@ _nsmap = {
     'wsdl': wsdl,
 }
 nsmap256 = _nsmap.copy()
-nsmap256.update({'smev': smev256})
+nsmap256.update({'spyne_smev': smev256})
 
 nsmap245 = _nsmap.copy()
-nsmap245.update({'smev': smev245})
+nsmap245.update({'spyne_smev': smev245})
