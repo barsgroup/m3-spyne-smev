@@ -32,7 +32,7 @@ x509_token_profile = (
     "http://docs.oasis-open.org/wss/2004/01/"
     "oasis-200401-wss-x509-token-profile-1.0#X509v3")
 
-_nsmap = {
+nsmap = {
     'xs': xs,
     'soapenv': soapenv,
     'soap': soap,
@@ -42,8 +42,8 @@ _nsmap = {
     'ds': ds,
     'wsdl': wsdl,
 }
-nsmap256 = _nsmap.copy()
+nsmap256 = nsmap.copy()
 nsmap256.update({'spyne_smev': smev256})
 
-nsmap245 = _nsmap.copy()
+nsmap245 = nsmap.copy()
 nsmap245.update({'spyne_smev': smev245})

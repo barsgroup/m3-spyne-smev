@@ -9,7 +9,7 @@ test_crypto.py
 
 import unittest
 
-from spyne_smev import _crypto as crypto
+from spyne_smev import crypto as crypto
 
 
 TEST_PRIVATE_KEY = """\
@@ -74,6 +74,24 @@ Cf5RD+YOsNHWu24Rk+LzSpoRg8UL+yD1617keO5jKeLe0Tr6lfONOB3HfmF8+HWv
 Bw==
 -----END CERTIFICATE-----\
 """
+
+TEST_ENVELOPE = """\
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                  xmlns:tns="http://example.com/tns">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <tns:TestMessageRequest>
+         <!--Optional:-->
+         <!--type: string-->
+         <tns:Message>Test message</tns:Message>
+         <!--Optional:-->
+         <!--type: integer-->
+         <tns:MessageCode>10</tns:MessageCode>
+      </tns:TestMessageRequest>
+   </soapenv:Body>
+</soapenv:Envelope>\
+"""
+
 
 # This results got from command line:
 # echo -n "Hello world!" | openssl dgst -binary -$MESSAGE_DIGEST_NAME | base64

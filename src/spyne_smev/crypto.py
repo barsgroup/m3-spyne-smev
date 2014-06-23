@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 
 """
-_crypto.py
+crypto.py
 
 :Created: 6/9/14
 :Author: timic
 """
+import logging as _logging
+logger = _logging.getLogger(__name__)
+# TODO: add log messages
 
 from functools import partial as _partial
 
