@@ -57,7 +57,7 @@ _raise_current_error = _partial(_exception_from_error_queue, Error)
 
 def get_text_digest(text, digest_name="md_gost94"):
     """
-    Returns Base64 encoded digest value for given text.
+    Returns binary digest value for given text.
 
     :param basestring text: Text for digest processing
     :param str digest_name: Digest algorithm name
@@ -92,8 +92,9 @@ def sign(
         data, private_key_data, private_key_pass=_ffi.NULL,
         digest_name="md_gost94"):
     """
+    Sign data with private key
     :param unicode data: Data to sign
-    :param unicode private_key_data: Private key
+    :param bytes private_key_data: Private key
     :param unicode private_key_pass: Private key's passphrase
     :param str digest_name: Message digest method
     :return unicode: Signature

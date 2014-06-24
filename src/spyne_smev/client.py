@@ -6,22 +6,22 @@ client.py
 :Created: 5/29/14
 :Author: timic
 """
-import logging
-logger = logging.getLogger(__name__)
+import logging as _logging
+logger = _logging.getLogger(__name__)
 
-from lxml import etree
-from suds.client import Client as SudsClient
-from suds.plugin import MessagePlugin
-from suds.sax.parser import Parser
+from lxml import etree as _etree
+from suds.client import Client as _SudsClient
+from suds.plugin import MessagePlugin as _MessagePlugin
+from suds.sax.parser import Parser as _Parser
 
-from libsmev.signer import verify_envelope_signature, sign_document
+from spyne_smev import wsse as _wsse, crypto as _crypto
 
 IN = 1
 OUT = 2
 BOTH = 3
 
 
-class Client(SudsClient):
+class Client(_SudsClient):
     """
     Клиент suds, в котором перекрыта возможность форматирования xml.
     Это необходимо для правильного вычисления подписей.
@@ -34,30 +34,56 @@ class Client(SudsClient):
 
     def __init__(
             self, url,
-            pem_fn=None, pem_pass=None, security_direction=BOTH,
-            **kwargs):
+            private_key_path=None, private_key=None, private_key_pass=None,
+            certificate_path=None, certificate=None, digest_name="md_gost94",
+            security_direction=BOTH, **kwargs):
         kwargs["prettyxml"] = False
-        if pem_fn and pem_pass:
-            self._smev_security = _SmevSecurity(
-                pem_fn, pem_pass, security_direction)
+
+        self._private_key_path = private_key_path
+        self._certificate_path = certificate_path
+        self._certificate = certificate
+        self._private_key = private_key
+        self._digest_name = digest_name
+
+        if self.certificate and self.private_key:
+            self._smev_security = _WsseSecurity(
+                self.private_key, private_key_pass, self.certificate,
+                digest_name, security_direction)
             kwargs.setdefault("plugins", []).append(self._smev_security)
         super(Client, self).__init__(url, **kwargs)
+
+    @property
+    def private_key(self):
+        if self._private_key is None:
+            with open(self._private_key_path) as fd:
+                self._private_key = fd.read()
+        return self._private_key
+
+    @property
+    def certificate(self):
+        if self._certificate is None:
+            with open(self._certificate_path) as fd:
+                self._certificate = fd.read()
+        return self._certificate
 
     @property
     def last_verified(self):
         return self._smev_security.last_verified
 
 
-class _SmevSecurity(MessagePlugin):
+class _WsseSecurity(_MessagePlugin):
 
-    def __init__(self, filename, password, direction=BOTH):
+    def __init__(self, private_key, private_key_password, certificate,
+                 digest_name="md_gost94", direction=BOTH):
 
         if not direction in (IN, OUT, BOTH):
             raise ValueError(
                 "direction should be constant either IN, OUT or BOTH!")
 
-        self.filename = filename
-        self.password = password
+        self.private_key = private_key
+        self.private_key_password = private_key_password
+        self.certificate = certificate
+        self.digest_name = digest_name
         self.direction = direction
         self._verified = None
 
@@ -65,34 +91,38 @@ class _SmevSecurity(MessagePlugin):
         if self.direction in (OUT, BOTH):
             logger.debug("Signing document ...")
 
-            document = etree.fromstring(context.envelope.plain())
+            document = _etree.fromstring(context.envelope.plain())
             try:
-                sign_document(document, self.filename, self.password)
+                _wsse.sign_document(
+                    document, self.private_key, self.private_key_password,
+                    self.certificate, self.digest_name)
             except Exception, e:
-                logger.error("Cannot sign document!")
+                logger.error("Cannot sign document")
                 logger.exception(e)
                 raise
-            out_string = etree.tostring(document, encoding="utf8")
-            out_object = Parser().parse(string=out_string)
+            out_string = _etree.tostring(document, encoding="utf8")
+            out_object = _Parser().parse(string=out_string)
             context.envelope.children = out_object.root().children
 
-            logger.debug("Successfully signed!")
+            logger.debug("Successfully signed")
 
     def received(self, context):
         if self.direction in (IN, BOTH):
             logger.debug("Verifying document ...")
             self._verified = False
-            document = etree.fromstring(context.reply)
+            document = _etree.fromstring(context.reply)
             try:
-                self._verified = verify_envelope_signature(document)
+                import ipdb; ipdb.set_trace()
+                _wsse.verify_document(document, self.digest_name)
+                self._verified = True
             except Exception, e:
                 logger.exception(e)
                 raise
             finally:
                 if self._verified:
-                    logger.debug("Successfully verified!")
+                    logger.debug("Successfully verified")
                 else:
-                    logger.error("Cannot verify!")
+                    logger.error("Verify failed")
 
     @property
     def last_verified(self):

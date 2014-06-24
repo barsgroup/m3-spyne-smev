@@ -97,4 +97,3 @@ if PY3:
 else:
     def byte_string(s):
         return s
-

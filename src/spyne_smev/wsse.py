@@ -39,7 +39,7 @@ class WSSecurity(BaseSecurity):
     def __init__(
             self,
             private_key_path=None, private_key=None, private_key_pass=None,
-            certificate_path=None, certificate=None):
+            certificate_path=None, certificate=None, digest_name="md_gost94"):
 
         assert private_key_path or private_key, (
             "Either `private_key_path` or `private_key` should be defined")
@@ -51,6 +51,7 @@ class WSSecurity(BaseSecurity):
         self._certificate_path = certificate_path
         self._certificate = certificate
         self._private_key = private_key
+        self.digest_name = digest_name
 
     @property
     def private_key(self):
@@ -76,9 +77,9 @@ class WSSecurity(BaseSecurity):
         logger.info("Signing document ...")
         unsigned = _deepcopy(envelope)
         try:
-            return _sign_document(
-                envelope, self._certificate_path,
-                self._private_key_pass, self._private_key_path)
+            return sign_document(
+                envelope, self.private_key,
+                self._private_key_pass, self.certificate, self.digest_name)
         except ValueError, e:
             logger.error(
                 "Error occurred while signing document:\n{0}\n"
@@ -94,7 +95,7 @@ class WSSecurity(BaseSecurity):
         """
         logger.info("Validate signed document")
         try:
-            _verify_document(envelope)
+            verify_document(envelope, self.digest_name)
         except (_crypto.Error, ValueError):
             logger.error("Fault! Invalid signature.")
         except _crypto.InvalidSignature:
@@ -208,7 +209,7 @@ def _construct_wsse_header(
     return root
 
 
-def _sign_document(
+def sign_document(
         document, private_key_data, private_key_pass,
         cert_data, digest_name="md_gost94"):
     """
@@ -216,9 +217,9 @@ def _sign_document(
 
     :param document: Document to sign
     :type document: lxml.etree.Element
-    :param unicode private_key_data: Private key text data
+    :param bytes private_key_data: Private key text data
     :param unicode private_key_pass: Private key password
-    :param unicode cert_data: Certificate text data
+    :param bytes cert_data: Certificate text data
     :return: Signed document
     :rtype: lxml.etree.Element
     """
@@ -269,7 +270,7 @@ def _sign_document(
     return out_document
 
 
-def _verify_document(document, digest_name="md_gost94"):
+def verify_document(document, digest_name="md_gost94"):
     """
     Check SOAP envelope signature according to SMEV recommendations
 
@@ -285,7 +286,7 @@ def _verify_document(document, digest_name="md_gost94"):
             "Incorrect soap envelope: "
             "`{{{soapenv}}}Body` tag not found".format(**_nsmap))
 
-    digest_value = document.find(".//{{{ds}}}DigestValue")
+    digest_value = document.find(".//{{{ds}}}DigestValue".format(**_nsmap))
     if digest_value is None:
         raise ValueError(
             "Incorrect xmldsig structure: "
@@ -296,29 +297,33 @@ def _verify_document(document, digest_name="md_gost94"):
     if binary_security_token is None:
         raise ValueError(
             "Incorrect xmldsig structure: "
-            "`{{{ds}}}BinarySecurityToken` tag not found".format(_nsmap))
+            "`{{{ds}}}BinarySecurityToken` tag not found".format(**_nsmap))
 
     signed_info = document.find(".//{{{ds}}}SignedInfo".format(**_nsmap))
     if signed_info is None:
         raise ValueError(
             "Incorrect xmldsig structure: "
-            "`{{{ds}}}SignedInfo` tag not found".format(_nsmap))
+            "`{{{ds}}}SignedInfo` tag not found".format(**_nsmap))
 
-    signature = document.find(".//{{{ds}}}SignatureValue".format(_nsmap))
+    signature = document.find(".//{{{ds}}}SignatureValue".format(**_nsmap))
     if signature is None:
         raise ValueError(
             "Incorrect xmldsig structure: "
-            "`{{{ds}}}SignatureValue` tag not found".format(_nsmap))
+            "`{{{ds}}}SignatureValue` tag not found".format(**_nsmap))
 
-    body_digest = _crypto.get_text_digest(
+    body_digest = _base64.b64encode(_crypto.get_text_digest(
         _c14n(body),
-        digest_name)
+        digest_name))
 
     if body_digest != digest_value.text:
         raise _crypto.InvalidSignature("Invalid `Body` digest!")
 
     _crypto.verify(
         _c14n(signed_info),
-        binary_security_token.text,
-        signature.text,
+        "".join((
+            "-----BEGIN CERTIFICATE-----\n",
+            binary_security_token.text,
+            "\n-----END CERTIFICATE-----"
+        )),
+        _base64.b64decode(signature.text),
         digest_name)

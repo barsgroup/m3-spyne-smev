@@ -1,30 +1,39 @@
-# -*- coding: utf-
+# -*- coding: utf-8 -*-
 
+"""               
+soap11wsse.py
+                  
+:Created: 24 Jun 2014  
+:Author: tim    
 """
-test_crypto.py
+import logging
+logging.basicConfig(level=logging.DEBUG)
 
-:Created: 10 Jun 2014
-:Author: tim
-"""
+from wsgiref.simple_server import make_server
 
-import unittest
+from spyne.application import Application
+from spyne.service import ServiceBase
+from spyne.decorator import rpc
+from spyne.server.wsgi import WsgiApplication
+from spyne.model.primitive import Integer, Unicode
+from spyne.model.complex import Iterable
 
-from spyne_smev import crypto
+from spyne_smev.wsse import Soap11WSSE, WSSecurity
 
+
+class HelloService(ServiceBase):
+
+    @rpc(Unicode, Integer, _returns=Iterable(Unicode))
+    def SayHello(ctx, Name, Times):
+        return (
+            u"Hello, {0}!".format(Name) for _ in xrange(Times)
+        )
 
 TEST_PRIVATE_KEY = """\
 -----BEGIN PRIVATE KEY-----
 MEUCAQAwHAYGKoUDAgITMBIGByqFAwICJAAGByqFAwICHgEEIgIgA5kTZ1It9Zot
 cWUB3wVSE1b7NCmcs3hNk/rxkFOUOOI=
 -----END PRIVATE KEY-----\
-"""
-
-TEST_PUBLIC_KEY = """\
------BEGIN PUBLIC KEY-----
-MGMwHAYGKoUDAgITMBIGByqFAwICJAAGByqFAwICHgEDQwAEQH4OmZwW9fXnaIpf
-aJ4xIs9FWZ1qmffsC6MkxOklmwZT33SWoHs40mftdHSJWuRCJjBUn/wjvXFlGNFT
-2nUgYbA=
------END PUBLIC KEY-----\
 """
 
 TEST_X509_CERT = """\
@@ -75,32 +84,17 @@ Bw==
 -----END CERTIFICATE-----\
 """
 
-# This results got from command line:
-# echo -n "Hello world!" | openssl dgst -binary -$MESSAGE_DIGEST_NAME | base64
-
-TEST_TEXT = "Hello World!"
-TEST_MD5_DIGEST = "hvsmnRkNLIX24EaM7KQqIA=="
-TEST_SHA1_DIGEST = "00hq6RNueFa8QiEjhep5cJRHWAI="
-TEST_GOST_DIGEST = "LVz/edXIlKU20rHfTnSilJEWGGYdEzQR3Rpm6HcVfhQ="
+security = WSSecurity(
+    private_key=TEST_PRIVATE_KEY, private_key_pass="12345678",
+    certificate=TEST_X509_CERT)
 
 
-class TestCase(unittest.TestCase):
+application = Application(
+    [HelloService], "http://example.com/hello-world-tns", "HelloWorld",
+    in_protocol=Soap11WSSE(),
+    out_protocol=Soap11WSSE(wsse_security=security))
 
-    def test_get_text_digest_md5(self):
-        self.assertEqual(
-            crypto.get_text_digest(TEST_TEXT, "md5"),
-            TEST_MD5_DIGEST)
-
-    def test_get_text_digest_sha1(self):
-        self.assertEqual(
-            crypto.get_text_digest(TEST_TEXT, "sha1"),
-            TEST_MD5_DIGEST)
-
-    def test_get_text_digest_gost(self):
-        self.assertEqual(
-            crypto.get_text_digest(TEST_TEXT, "md_gost94"),
-            TEST_MD5_DIGEST)
-
-    def test_verify_signature(self):
-        self.assertEqual(True, False)
-
+if __name__ == "__main__":
+    wsgi_application = WsgiApplication(application)
+    server = make_server("localhost", 8080, wsgi_application)
+    server.serve_forever()
