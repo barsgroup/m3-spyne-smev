@@ -6,23 +6,21 @@ _base.py
 :Created: 5/13/14
 :Author: timic
 """
-import logging
+import logging as _logging
+logger = _logging.getLogger(__name__)
 
-from spyne_smev import _xmlns as ns
 
+from lxml import etree as _etree
 
-logger = logging.getLogger(__name__)
+from spyne.interface.wsdl.wsdl11 import Wsdl11 as _Wsdl11
+from spyne.model.fault import Fault as _Fault
 
-from lxml import etree
-
-from spyne.interface.wsdl.wsdl11 import Wsdl11
-from spyne.model.fault import Fault
-
-from _utils import load_schema, load_xml, Cap, copy_with_nsmap
+import _utils
+import _xmlns as _ns
 from wsse import Soap11WSSE
 
 
-class ApiError(Fault):
+class ApiError(_Fault):
     """
     Специальный exception, который может быть возбужден в api-методе.
 
@@ -54,7 +52,7 @@ class ApiError(Fault):
         return self.errorMessage
 
     def __repr__(self):
-        return u"Error(%s: %s)" % (self.errorCode, self.errorMessage)
+        return u"Error({0}: {1})".format(self.errorCode, self.errorMessage)
 
 
 class BaseSmev(Soap11WSSE):
@@ -86,25 +84,28 @@ class BaseSmev(Soap11WSSE):
         super(BaseSmev, self).create_in_document(ctx, charset)
         in_document, _ = ctx.in_document
         if ctx.udc is None:
-            ctx.udc = Cap()
+            ctx.udc = _utils.Cap()
         ctx.udc.in_smev_header_document = in_document.find(
-            ".//{%(spyne_smev)s}Header" % self._ns)
+            ".//{{{smev}}}Header".format(**self._ns))
         ctx.udc.in_smev_message_document = in_document.find(
-            ".//{%(spyne_smev)s}Message" % self._ns)
+            ".//{{{smev}}}Message".format(**self._ns))
         ctx.udc.in_smev_appdoc_document = in_document.find(
-            ".//{%(spyne_smev)s}AppDocument" % self._ns)
+            ".//{{{smev}}}AppDocument".format(**self._ns))
         message_data = in_document.find(
-            ".//{%(spyne_smev)s}MessageData" % self._ns)
-        if not all((ctx.udc.in_smev_message_document, message_data)):
-            raise Fault("SMEV-100010", "Invalid configuration!")
-        map(self._validate_smev_element, filter(bool, (
+            ".//{{{smev}}}MessageData".format(**self._ns))
+
+        if any(map(_utils.isnone,
+                   (ctx.udc.in_smev_message_document, message_data))):
+            raise _Fault("SMEV-100010", "Invalid configuration!")
+
+        map(self._validate_smev_element, filter(_utils.notisnone, (
             ctx.udc.in_smev_message_document,
             ctx.udc.in_smev_header_document,
             message_data)))
         method_data = message_data.find(
-            ".//{%(spyne_smev)s}AppData" % self._ns).getchildren()
+            ".//{{{smev}}}AppData".format(**self._ns)).getchildren()
         method = in_document.find(
-            ".//{%s}Body" % ns.soapenv).getchildren()[0]
+            ".//{{{0}}}Body".format(_ns.soapenv)).getchildren()[0]
         method.clear()
         method.extend(method_data)
         self.event_manager.fire_event('smev_in_document_built', ctx)
@@ -121,25 +122,26 @@ class BaseSmev(Soap11WSSE):
             self.construct_smev_envelope(ctx, message)
 
     def _validate_smev_element(self, element):
-        self._smev_schema = self._smev_schema or load_schema(
+        self._smev_schema = self._smev_schema or _utils.load_schema(
             self._smev_schema_path)
         if not self._smev_schema.validate(element):
             errors = "\n".join((
                 err.message for err in self._smev_schema.error_log))
-            raise Fault(
+            raise _Fault(
                 "SMEV-102000",
-                "Message didn't pass validation checks! Errors:\n%s" % errors)
+                "Message didn't pass validation checks!"
+                " Errors:\n{0}".format(errors))
 
     def to_parent_element(self, cls, value, tns, parent_elt, *args, **kwargs):
         if issubclass(cls, ApiError):
-            message = etree.SubElement(
-                parent_elt, "{%s}%s" % (tns, value.messageName))
-            error = etree.SubElement(message, "{%s}%s" % (tns, "Error"))
-            etree.SubElement(
-                error, "{%s}%s" % (tns, "errorCode")
+            message = _etree.SubElement(
+                parent_elt, "{{{0}}}{1}".format(tns, value.messageName))
+            error = _etree.SubElement(message, "{{{0}}}{1}".format(tns, "Error"))
+            _etree.SubElement(
+                error, "{{{0}}}{1}".format(tns, "errorCode")
             ).text = value.errorCode
-            etree.SubElement(
-                error, "{%s}%s" % (tns, "errorMessage")
+            _etree.SubElement(
+                error, "{{{0}}}{1}".format(tns, "errorMessage")
             ).text = value.errorMessage
         else:
             super(BaseSmev, self).to_parent_element(
@@ -155,7 +157,7 @@ class BaseSmev(Soap11WSSE):
         raise NotImplementedError()
 
 
-class BaseSmevWsdl(Wsdl11):
+class BaseSmevWsdl(_Wsdl11):
 
     smev_schema_path = None
     smev_ns = None
@@ -165,17 +167,18 @@ class BaseSmevWsdl(Wsdl11):
     def __init__(self, interface=None, _with_partnerlink=False):
         super(BaseSmevWsdl, self).__init__(interface, _with_partnerlink)
         self._ns = self.interface.nsmap.copy()
-        self._ns.update({'spyne_smev': self.smev_ns})
+        self._ns.update({'smev': self.smev_ns})
 
     def _get_smev_schema(self):
-        self.__smev_schema = self.__smev_schema or load_xml(
+        self.__smev_schema = self.__smev_schema or _utils.load_xml(
             self.smev_schema_path)
         return self.__smev_schema
 
     def build_interface_document(self, url):
         super(BaseSmevWsdl, self).build_interface_document(url)
         smev_schema = self._get_smev_schema().getroot()
-        smev_schema = copy_with_nsmap(smev_schema, dict(tns=self._ns["tns"]))
+        smev_schema = _utils.copy_with_nsmap(
+            smev_schema, dict(tns=self._ns["tns"]))
         messages = self.root_elt.xpath(
             "./wsdl:portType/wsdl:operation/wsdl:input/@message | "
             "./wsdl:portType/wsdl:operation/wsdl:output/@message",
@@ -185,41 +188,49 @@ class BaseSmevWsdl(Wsdl11):
             self._create_message_schema(smev_schema, message)
 
         tns_schema = self.root_elt.find(
-            "./{%(wsdl)s}types/{%(xs)s}schema[@targetNamespace='%(tns)s']"
-            % self._ns)
-        new_tns_schema = copy_with_nsmap(tns_schema, {'spyne_smev': self.smev_ns})
+            "./{{{wsdl}}}types/{{{xs}}}schema[@targetNamespace='{tns}']"
+            .format(**self._ns))
+        new_tns_schema = _utils.copy_with_nsmap(
+            tns_schema, {'smev': self.smev_ns})
+
+        # importing smev schema into tns, required
+        # for compatibility with suds client
+        new_tns_schema.insert(0, _etree.Element(
+            "{{{xs}}}import".format(**self._ns), namespace=self.smev_ns))
 
         for _, message in messages:
             element = new_tns_schema.find(
-                './/{%s}element[@name="%s"]' % (ns.xs, message))
-            element.attrib['type'] = 'spyne_smev:%sType' % message
+                './/{{{0}}}element[@name="{1}"]'.format(_ns.xs, message))
+            element.attrib['type'] = 'smev:{0}Type'.format(message)
 
-        self.root_elt.find("./{%s}types" % ns.wsdl).insert(0, smev_schema)
+        self.root_elt.find(
+            "./{{{0}}}types".format(_ns.wsdl)).insert(0, smev_schema)
         tns_schema.getparent().replace(tns_schema, new_tns_schema)
 
         self._add_smev_headers(self.root_elt)
-        self._Wsdl11__wsdl = etree.tostring(
+        self._Wsdl11__wsdl = _etree.tostring(
             self.root_elt, encoding='UTF-8')
 
     def _create_message_schema(self, schema, message):
-        root = etree.SubElement(
-            schema, "{%(xs)s}complexType" % self._ns,
-            name="%sType" % message)
-        seq = etree.SubElement(root, "{%(xs)s}sequence" % self._ns)
-        etree.SubElement(
-            seq, "{%(xs)s}element" % ns.nsmap256,
-            name="Message", type="spyne_smev:MessageType")
-        message_data = etree.SubElement(
-            seq, "{%(xs)s}element" % ns.nsmap256, name="MessageData")
-        complex_type = etree.SubElement(
-            message_data, "{%(xs)s}complexType" % self._ns)
-        seq = etree.SubElement(complex_type, "{%(xs)s}sequence" % self._ns)
-        etree.SubElement(
-            seq, "{%(xs)s}element" % self._ns,
-            name="AppData", type="tns:%s" % message, minOccurs="0")
-        etree.SubElement(
-            seq, "{%(xs)s}element" % self._ns,
-            name="AppDocument", type="spyne_smev:AppDocumentType", minOccurs="0")
+        root = _etree.SubElement(
+            schema, "{{{xs}}}complexType".format(**self._ns),
+            name="{0}Type".format(message))
+        seq = _etree.SubElement(root, "{{{xs}}}sequence".format(**self._ns))
+        _etree.SubElement(
+            seq, "{{{xs}}}element".format(**_ns.nsmap256),
+            name="Message", type="smev:MessageType")
+        message_data = _etree.SubElement(
+            seq, "{{{xs}}}element".format(**_ns.nsmap256), name="MessageData")
+        complex_type = _etree.SubElement(
+            message_data, "{{{xs}}}complexType".format(**self._ns))
+        seq = _etree.SubElement(
+            complex_type, "{{{xs}}}sequence".format(**self._ns))
+        _etree.SubElement(
+            seq, "{{{xs}}}element" .format(**self._ns),
+            name="AppData", type="tns:{0}".format(message), minOccurs="0")
+        _etree.SubElement(
+            seq, "{{{xs}}}element".format(**self._ns),
+            name="AppDocument", type="smev:AppDocumentType", minOccurs="0")
         return root
 
     def _add_smev_headers(self, wsdl):
@@ -228,27 +239,27 @@ class BaseSmevWsdl(Wsdl11):
             "./wsdl:binding/wsdl:operation/wsdl:output",
             namespaces=self._ns)
 
-        header_message = etree.Element(
-            "{%(wsdl)s}message" % self._ns, name='SmevHeader')
+        header_message = _etree.Element(
+            "{{{wsdl}}}message".format(**self._ns), name="SmevHeader")
         message_pos = wsdl.index(wsdl.findall(
-            './{%(wsdl)s}message' % self._ns)[-1])
+            './{{{wsdl}}}message'.format(**self._ns))[-1])
         wsdl.insert(message_pos, header_message)
 
-        etree.SubElement(
-            header_message, "{%(wsdl)s}part" % self._ns,
-            nsmap={'spyne_smev': self.smev_ns},
-            name="SmevHeader", element="spyne_smev:Header")
+        _etree.SubElement(
+            header_message, "{{{wsdl}}}part".format(**self._ns),
+            nsmap={"smev": self.smev_ns},
+            name="SmevHeader", element="smev:Header")
 
         for operation in operations:
             binding = operation.getparent().getparent().find(
-                "{%(soap)s}binding" % self._ns)
+                "{{{soap}}}binding".format(**self._ns))
             style = binding.attrib['style']
-            header = operation.find("./{%(soap)s}header" % self._ns)
+            header = operation.find("./{{{soap}}}header".format(**self._ns))
             if header and style == 'document':
                 binding['style'] = 'rpc'
-            etree.SubElement(
-                operation, "{%(soap)s}header" % self._ns,
-                nsmap={'spyne_smev': self.smev_ns},
-                message='tns:SmevHeader',
-                part='SmevHeader',
-                use='literal')
+            _etree.SubElement(
+                operation, "{{{soap}}}header".format(**self._ns),
+                nsmap={"smev": self.smev_ns},
+                message="tns:SmevHeader",
+                part="SmevHeader",
+                use="literal")

@@ -16,10 +16,6 @@ from suds.sax.parser import Parser as _Parser
 
 from spyne_smev import wsse as _wsse, crypto as _crypto
 
-IN = 1
-OUT = 2
-BOTH = 3
-
 
 class Client(_SudsClient):
     """
@@ -31,6 +27,10 @@ class Client(_SudsClient):
     :param unicode pem_fn: Путь к файлу с ЭЦП
     :param unicode pem_pass: Пароль с ЭЦП
     """
+
+    IN = 1
+    OUT = 2
+    BOTH = 3
 
     def __init__(
             self, url,
@@ -47,21 +47,21 @@ class Client(_SudsClient):
 
         if self.certificate and self.private_key:
             self._smev_security = _WsseSecurity(
-                self.private_key, private_key_pass, self.certificate,
-                digest_name, security_direction)
+                self.private_key, private_key_pass or _crypto._ffi.NULL,
+                self.certificate, digest_name, security_direction)
             kwargs.setdefault("plugins", []).append(self._smev_security)
         super(Client, self).__init__(url, **kwargs)
 
     @property
     def private_key(self):
-        if self._private_key is None:
+        if self._private_key is None and self._private_key_path:
             with open(self._private_key_path) as fd:
                 self._private_key = fd.read()
         return self._private_key
 
     @property
     def certificate(self):
-        if self._certificate is None:
+        if self._certificate is None and self._certificate_path:
             with open(self._certificate_path) as fd:
                 self._certificate = fd.read()
         return self._certificate
@@ -74,9 +74,9 @@ class Client(_SudsClient):
 class _WsseSecurity(_MessagePlugin):
 
     def __init__(self, private_key, private_key_password, certificate,
-                 digest_name="md_gost94", direction=BOTH):
+                 digest_name="md_gost94", direction=Client.BOTH):
 
-        if not direction in (IN, OUT, BOTH):
+        if not direction in (Client.IN, Client.OUT, Client.BOTH):
             raise ValueError(
                 "direction should be constant either IN, OUT or BOTH!")
 
@@ -88,31 +88,29 @@ class _WsseSecurity(_MessagePlugin):
         self._verified = None
 
     def marshalled(self, context):
-        if self.direction in (OUT, BOTH):
+        if self.direction in (Client.OUT, Client.BOTH):
             logger.debug("Signing document ...")
-
             document = _etree.fromstring(context.envelope.plain())
             try:
-                _wsse.sign_document(
+                out_document = _wsse.sign_document(
                     document, self.private_key, self.private_key_password,
                     self.certificate, self.digest_name)
             except Exception, e:
                 logger.error("Cannot sign document")
                 logger.exception(e)
                 raise
-            out_string = _etree.tostring(document, encoding="utf8")
+            out_string = _etree.tostring(out_document, encoding="utf8")
             out_object = _Parser().parse(string=out_string)
             context.envelope.children = out_object.root().children
 
             logger.debug("Successfully signed")
 
     def received(self, context):
-        if self.direction in (IN, BOTH):
+        if self.direction in (Client.IN, Client.BOTH):
             logger.debug("Verifying document ...")
             self._verified = False
             document = _etree.fromstring(context.reply)
             try:
-                import ipdb; ipdb.set_trace()
                 _wsse.verify_document(document, self.digest_name)
                 self._verified = True
             except Exception, e:

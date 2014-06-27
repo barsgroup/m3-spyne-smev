@@ -97,3 +97,7 @@ if PY3:
 else:
     def byte_string(s):
         return s
+
+
+isnone = lambda obj: obj is None
+notisnone = lambda obj: not obj is None

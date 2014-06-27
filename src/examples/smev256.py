@@ -6,20 +6,17 @@ soap11wsse.py
 :Created: 24 Jun 2014  
 :Author: tim    
 """
-import logging
-logging.basicConfig(level=logging.DEBUG)
-
 from wsgiref.simple_server import make_server
 
-from spyne.application import Application
 from spyne.service import ServiceBase
 from spyne.decorator import rpc
-from spyne.server.wsgi import WsgiApplication
 from spyne.model.primitive import Integer, Unicode
 from spyne.model.complex import Iterable
 
-from spyne_smev.wsse import Soap11WSSE, WSSecurity
-
+from spyne_smev.application import Application
+from spyne_smev.server.wsgi import WsgiApplication
+from spyne_smev.wsse import WSSecurity
+from spyne_smev.smev256 import Smev256
 
 TEST_PRIVATE_KEY = """\
 -----BEGIN PRIVATE KEY-----
@@ -76,6 +73,10 @@ Bw==
 -----END CERTIFICATE-----\
 """
 
+security = WSSecurity(
+    private_key=TEST_PRIVATE_KEY, private_key_pass="12345678",
+    certificate=TEST_X509_CERT)
+
 
 class HelloService(ServiceBase):
 
@@ -83,17 +84,39 @@ class HelloService(ServiceBase):
     def SayHello(ctx, Name, Times):
         return (u"Hello, {0}!".format(Name) for _ in xrange(Times))
 
-security = WSSecurity(
-    private_key=TEST_PRIVATE_KEY, private_key_pass="12345678",
-    certificate=TEST_X509_CERT)
-
-
 application = Application(
     [HelloService], "http://example.com/hello-world-tns", "HelloWorld",
-    in_protocol=Soap11WSSE(wsse_security=security),
-    out_protocol=Soap11WSSE(wsse_security=security))
+    in_protocol=Smev256(wsse_security=security),
+    out_protocol=Smev256(wsse_security=security))
 
 if __name__ == "__main__":
+    import logging
+    logging.basicConfig(level=logging.DEBUG)
     wsgi_application = WsgiApplication(application)
     server = make_server("localhost", 8080, wsgi_application)
     server.serve_forever()
+
+
+### client code
+#
+# from spyne_smev.client import Client
+#
+# client = Client(
+#     "http://localhost:8080?wsdl",
+#     private_key=TEST_PRIVATE_KEY, private_key_pass="12345678",
+#     certificate=TEST_X509_CERT)
+# msg = client.factory.create("SayHello")
+# msg.Message.Sender.Code = "Sndr12345"
+# msg.Message.Sender.Name = "Sender"
+# msg.Message.Recipient.Code = "Rcpnt1234"
+# msg.Message.Recipient.Name = "Recipient"
+# msg.MessageData.AppData.Name = "John Smith"
+# msg.MessageData.AppData.Times = 5
+# greetings = client.service.SayHello(
+#     msg.Message, msg.MessageData)
+# if not client.last_verified:
+#     raise ValueError(
+#         "msg didn't pass validation checks. See debug log for details!")
+# print "\n".join("{0}. {1}".format(i, name) for i, name in enumerate(
+#     greetings.MessageData.AppData.string))
+###

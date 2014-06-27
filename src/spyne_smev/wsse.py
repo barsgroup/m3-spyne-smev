@@ -96,10 +96,14 @@ class WSSecurity(BaseSecurity):
         logger.info("Validate signed document")
         try:
             verify_document(envelope, self.digest_name)
-        except (_crypto.Error, ValueError):
-            logger.error("Fault! Invalid signature.")
+        except (_crypto.Error, ValueError), e:
+            logger.error("Signature check failed! Error:\n{0}".format(
+                unicode(e)))
+            raise _Fault(
+                faultstring="Signature check failed! Error:\n{0}".format(
+                    unicode(e)))
         except _crypto.InvalidSignature:
-            raise _Fault('SMEV-100003', 'Invalid signature!')
+            raise _Fault(faultstring="Invalid signature!")
 
 
 class Soap11WSSE(_Soap11):
@@ -112,7 +116,7 @@ class Soap11WSSE(_Soap11):
 
     def __init__(
         self, app=None, validator=None, xml_declaration=True,
-        cleanup_namespaces=True, encoding='UTF-8', pretty_print=False,
+        cleanup_namespaces=True, encoding="UTF-8", pretty_print=False,
         wsse_security=None,
     ):
         self.wsse_security = wsse_security
@@ -129,7 +133,7 @@ class Soap11WSSE(_Soap11):
             self.wsse_security.validate(in_document)
 
     def create_out_string(self, ctx, charset=None):
-        if self.wsse_security:
+        if self.wsse_security and ctx.method_name:
             ctx.out_document = self.wsse_security.apply(ctx.out_document)
         super(Soap11WSSE, self).create_out_string(ctx, charset)
 
@@ -227,7 +231,7 @@ def sign_document(
     out_document = _deepcopy(document)
     header_node = out_document.find(
         "./{{{soapenv}}}Header".format(**_nsmap))
-    if not header_node:
+    if header_node is None:
         header_node = _etree.Element("{{{soapenv}}}Header".format(**_nsmap))
         out_document.insert(0, header_node)
 

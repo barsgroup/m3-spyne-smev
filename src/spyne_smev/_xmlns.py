@@ -7,9 +7,9 @@ _xmlns.py
 :Author: timic
 """
 
-smev245 = "http://spyne_smev.gosuslugi.ru/rev111111"
-smev256 = "http://spyne_smev.gosuslugi.ru/rev120315"
-inf = "http://spyne_smev.gosuslugi.ru/inf"
+smev245 = "http://smev.gosuslugi.ru/rev111111"
+smev256 = "http://smev.gosuslugi.ru/rev120315"
+inf = "http://smev.gosuslugi.ru/inf"
 soapenv = "http://schemas.xmlsoap.org/soap/envelope/"
 wsdl = "http://schemas.xmlsoap.org/wsdl/"
 soap = "http://schemas.xmlsoap.org/wsdl/soap/"
@@ -43,7 +43,7 @@ nsmap = {
     'wsdl': wsdl,
 }
 nsmap256 = nsmap.copy()
-nsmap256.update({'spyne_smev': smev256})
+nsmap256.update({'smev': smev256})
 
 nsmap245 = nsmap.copy()
-nsmap245.update({'spyne_smev': smev245})
+nsmap245.update({'smev': smev245})
