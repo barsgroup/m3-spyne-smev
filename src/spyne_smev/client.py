@@ -35,7 +35,7 @@ class Client(_SudsClient):
     def __init__(
             self, url,
             private_key_path=None, private_key=None, private_key_pass=None,
-            certificate_path=None, certificate=None, digest_name="md_gost94",
+            certificate_path=None, certificate=None, digest_method="md_gost94",
             security_direction=BOTH, **kwargs):
         kwargs["prettyxml"] = False
 
@@ -43,12 +43,12 @@ class Client(_SudsClient):
         self._certificate_path = certificate_path
         self._certificate = certificate
         self._private_key = private_key
-        self._digest_name = digest_name
+        self._digest_method = digest_method
 
         if self.certificate and self.private_key:
             self._smev_security = _WsseSecurity(
                 self.private_key, private_key_pass or _crypto._ffi.NULL,
-                self.certificate, digest_name, security_direction)
+                self.certificate, digest_method, security_direction)
             kwargs.setdefault("plugins", []).append(self._smev_security)
         super(Client, self).__init__(url, **kwargs)
 
@@ -74,7 +74,7 @@ class Client(_SudsClient):
 class _WsseSecurity(_MessagePlugin):
 
     def __init__(self, private_key, private_key_password, certificate,
-                 digest_name="md_gost94", direction=Client.BOTH):
+                 digest_method="md_gost94", direction=Client.BOTH):
 
         if not direction in (Client.IN, Client.OUT, Client.BOTH):
             raise ValueError(
@@ -83,7 +83,7 @@ class _WsseSecurity(_MessagePlugin):
         self.private_key = private_key
         self.private_key_password = private_key_password
         self.certificate = certificate
-        self.digest_name = digest_name
+        self.digest_method = digest_method
         self.direction = direction
         self._verified = None
 
@@ -93,8 +93,8 @@ class _WsseSecurity(_MessagePlugin):
             document = _etree.fromstring(context.envelope.plain())
             try:
                 out_document = _wsse.sign_document(
-                    document, self.private_key, self.private_key_password,
-                    self.certificate, self.digest_name)
+                    document, self.certificate, self.private_key,
+                    self.private_key_password, self.digest_method)
             except Exception, e:
                 logger.error("Cannot sign document")
                 logger.exception(e)
@@ -111,7 +111,7 @@ class _WsseSecurity(_MessagePlugin):
             self._verified = False
             document = _etree.fromstring(context.reply)
             try:
-                _wsse.verify_document(document, self.digest_name)
+                _wsse.verify_document(document, self.certificate)
                 self._verified = True
             except Exception, e:
                 logger.exception(e)

@@ -15,7 +15,7 @@ from spyne.model.complex import Iterable
 
 from spyne_smev.application import Application
 from spyne_smev.server.wsgi import WsgiApplication
-from spyne_smev.wsse import WSSecurity
+from spyne_smev.wsse import X509TokenProfile
 from spyne_smev.smev256 import Smev256
 
 TEST_PRIVATE_KEY = """\
@@ -73,7 +73,7 @@ Bw==
 -----END CERTIFICATE-----\
 """
 
-security = WSSecurity(
+security = X509TokenProfile(
     private_key=TEST_PRIVATE_KEY, private_key_pass="12345678",
     certificate=TEST_X509_CERT)
 

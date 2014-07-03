@@ -89,23 +89,22 @@ def get_text_digest(text, digest_name="md_gost94"):
 
 
 def sign(
-        data, private_key_data, private_key_pass=_ffi.NULL,
-        digest_name="md_gost94"):
+        data, pkey_buffer, pkey_pass=_ffi.NULL, digest_name="md_gost94"):
     """
-    Sign data with private key
+    Sign data with private key. Returns binary signature
+
     :param unicode data: Data to sign
-    :param bytes private_key_data: Private key
-    :param unicode private_key_pass: Private key's passphrase
+    :param bytes pkey_buffer: Private key
+    :param unicode pkey_pass: Private key's passphrase
     :param str digest_name: Message digest method
-    :return unicode: Signature
+    :return bytes: Signature
     """
-    pkey = _load_private_key(private_key_data, private_key_pass)
 
     md = _lib.EVP_get_digestbyname(_utils.byte_string(digest_name))
     if md == _ffi.NULL:
-        raise ValueError("No such digest method")
+        raise ValueError("No such digest method: {0}".format(digest_name))
 
-    md_ctx = _ffi.new("EVP_MD_CTX*")
+    md_ctx = _ffi.new("EVP_MD_CTX *")
     md_ctx = _ffi.gc(md_ctx, _lib.EVP_MD_CTX_cleanup)
 
     if _lib.EVP_SignInit(md_ctx, md) != 1:
@@ -113,9 +112,10 @@ def sign(
     if _lib.EVP_SignUpdate(md_ctx, data, len(data)) != 1:
         _raise_current_error()
 
-    signature_buffer = _ffi.new("unsigned char[]", 512)
-    signature_length = _ffi.new("unsigned int*")
+    signature_buffer = _ffi.new("unsigned char []", 512)
+    signature_length = _ffi.new("unsigned int *")
     signature_length[0] = len(signature_buffer)
+    pkey = _load_private_key(pkey_buffer, pkey_pass)
     final_result = _lib.EVP_SignFinal(
         md_ctx, signature_buffer, signature_length, pkey)
 
@@ -125,13 +125,17 @@ def sign(
     return _ffi.buffer(signature_buffer, signature_length[0])[:]
 
 
-def verify(text, cert_data, signature, digest_name="md_gost94"):
+def verify(data, cert_data, signature, digest_name="md_gost94"):
     """
-    :param basestring text:
-    :param basestring cert_data:
-    :param basestring signature:
-    :param str digest_name:
-    :raises: ValueError, InvalidSignature
+    Verifies text signature with certificate. Raises InvalidSignature in case
+    of signature is not correct and Error if internal openssl error occurred.
+
+    :param basestring data: Signed data
+    :param basestring cert_data: Certificate
+    :param basestring signature: Binary signature of data
+    :param str digest_name: Digest method name
+    :raises: ValueError, spyne_smev.crypto.InvalidSignature,
+              spyne_smev.crypto.Error
     """
     md = _lib.EVP_get_digestbyname(_utils.byte_string(digest_name))
 
@@ -144,7 +148,7 @@ def verify(text, cert_data, signature, digest_name="md_gost94"):
     if _lib.EVP_VerifyInit(md_ctx, md) == 0:
         _raise_current_error()
 
-    if _lib.EVP_VerifyUpdate(md_ctx, text, len(text)) == 0:
+    if _lib.EVP_VerifyUpdate(md_ctx, data, len(data)) == 0:
         _raise_current_error()
 
     cert = _load_certificate(cert_data)
@@ -221,3 +225,17 @@ def _load_private_key(pem_buffer, pass_phrase=_ffi.NULL):
         _raise_current_error()
 
     return _ffi.gc(evp_pkey, _lib.EVP_PKEY_free)
+
+
+def get_signature_algorithm_name(certificate):
+
+    cert = _load_certificate(certificate)
+    digest_nid = _lib.OBJ_obj2nid(cert.cert_info.signature.algorithm)
+    if digest_nid == _lib.NID_undef:
+        raise ValueError("Unsupported certificate signature algorithm")
+
+    digest_name = _lib.OBJ_nid2sn(digest_nid)
+    if digest_name == _ffi.NULL:
+        _raise_current_error()
+
+    return _ffi.string(digest_name)
