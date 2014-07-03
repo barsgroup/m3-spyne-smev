@@ -10,7 +10,7 @@ setup(
     name="spyne-smev",
     packages=[
         "spyne_smev", "spyne_smev.smev256", "spyne_smev.smev255",
-        "spyne_smev.server"],
+        "spyne_smev.server", "spyne_smev.wsse"],
     package_dir={"": "src"},
     package_data={"": ["xsd/*"]},
     url="http://bitbucket.org/timic/spyne-smev",
