@@ -3,5 +3,6 @@ demo/*
 .idea/*
 src/wsfactory/schema/log/*
 dist/*
+build/*
 MANIFEST
 src/wsfactory/schema/config.xml
