@@ -257,9 +257,6 @@ def _construct_wsse_header(
     transforms = _etree.SubElement(ref, ds("Transforms"))
     _etree.SubElement(
         transforms, ds("Transform"),
-        Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature")
-    _etree.SubElement(
-        transforms, ds("Transform"),
         Algorithm=_xmlns.exc_c14n)
     _etree.SubElement(
         ref, ds("DigestMethod"),
