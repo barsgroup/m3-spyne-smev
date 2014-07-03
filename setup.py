@@ -13,13 +13,11 @@ setup(
         "spyne_smev.server", "spyne_smev.wsse"],
     package_dir={"": "src"},
     package_data={"": ["xsd/*"]},
-    url="http://bitbucket.org/timic/spyne-smev",
+    url="http://bitbucket.org/bars-group/spyne-smev",
     license=read_file("LICENSE"),
     description=read_file("DESCRIPTION"),
     author="Timur Salyakhutdinov",
     author_email="t.salyakhutdinov@gmail.com",
-    install_requires=[
-        "lxml",
-        "-e https://github.com/timic/cryptography/archive/0.4.1.zip"
-        "#egg=cryptography"],
+    install_requires=read_file("REQUIREMENTS")
+
 )
