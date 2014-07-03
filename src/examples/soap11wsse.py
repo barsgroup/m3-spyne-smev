@@ -19,7 +19,7 @@ from spyne.server.wsgi import WsgiApplication
 from spyne.model.primitive import Integer, Unicode
 from spyne.model.complex import Iterable
 
-from spyne_smev.wsse import Soap11WSSE, X509TokenProfile
+from spyne_smev.wsse.protocols import Soap11WSSE, X509TokenProfile
 
 
 TEST_PRIVATE_KEY = """\

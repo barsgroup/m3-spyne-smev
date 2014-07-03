@@ -15,7 +15,7 @@ from spyne.model.complex import Iterable
 
 from spyne_smev.application import Application
 from spyne_smev.server.wsgi import WsgiApplication
-from spyne_smev.wsse import X509TokenProfile
+from spyne_smev.wsse.protocols import X509TokenProfile
 from spyne_smev.smev256 import Smev256
 
 TEST_PRIVATE_KEY = """\

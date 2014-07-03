@@ -17,7 +17,7 @@ from spyne.model.fault import Fault as _Fault
 
 import _utils
 import _xmlns as _ns
-from wsse import Soap11WSSE
+from spyne_smev.wsse.protocols import Soap11WSSE
 
 
 class ApiError(_Fault):

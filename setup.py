@@ -18,5 +18,6 @@ setup(
     description=read_file("DESCRIPTION"),
     author="Timur Salyakhutdinov",
     author_email="t.salyakhutdinov@gmail.com",
-    requires=["lxml", "spyne", "cryptography"],
+    requires=[
+        "lxml", "https://github.com/timic/cryptography/archive/0.4.1.zip"],
 )
