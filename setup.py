@@ -18,8 +18,9 @@ setup(
     description=read_file("DESCRIPTION"),
     author="Timur Salyakhutdinov",
     author_email="t.salyakhutdinov@gmail.com",
-    requires=["lxml"],
+    requires=["lxml", "cryptography==0.4.1"],
     dependency_links=[
         "https://github.com/timic/cryptography/archive/0.4.1.zip"
+        "#egg=cryptography-0.4.1"
     ]
 )
