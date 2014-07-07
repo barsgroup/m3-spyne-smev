@@ -35,7 +35,7 @@ class X509TokenProfile(BaseWSS):
             self,
             private_key_path=None, private_key=None, private_key_pass=None,
             certificate_path=None, certificate=None,
-            digest_method="md_gost94",
+            digest_method="sha1",
             exclusive_c14n=True, c14n_with_comments=False):
 
         assert private_key_path or private_key, (

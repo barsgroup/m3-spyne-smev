@@ -55,7 +55,7 @@ def _exception_from_error_queue(exception_type):
 _raise_current_error = _partial(_exception_from_error_queue, Error)
 
 
-def get_text_digest(text, digest_name="md_gost94"):
+def get_text_digest(text, digest_name="sha1"):
     """
     Returns binary digest value for given text.
 
@@ -89,7 +89,7 @@ def get_text_digest(text, digest_name="md_gost94"):
 
 
 def sign(
-        data, pkey_buffer, pkey_pass=_ffi.NULL, digest_name="md_gost94"):
+        data, pkey_buffer, pkey_pass=_ffi.NULL, digest_name="sha1"):
     """
     Sign data with private key. Returns binary signature
 
@@ -125,7 +125,7 @@ def sign(
     return _ffi.buffer(signature_buffer, signature_length[0])[:]
 
 
-def verify(data, cert_data, signature, digest_name="md_gost94"):
+def verify(data, cert_data, signature, digest_name="sha1"):
     """
     Verifies text signature with certificate. Raises InvalidSignature in case
     of signature is not correct and Error if internal openssl error occurred.

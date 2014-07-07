@@ -70,7 +70,7 @@ def _get_clean_cert_data(certificate):
 def _construct_wsse_header(
         certificate,
         actor="http://smev.gosuslugi.ru/actors/smev",
-        digest_method="md_gost94",
+        digest_method="sha1",
         signature_method=None):
     digest_method_ns = _digest_method_nsmap.get(digest_method, None)
     if digest_method_ns is None:
@@ -141,7 +141,7 @@ def _construct_wsse_header(
 
 def sign_document(
         document, cert_data, pkey_data, pkey_pass,
-        digest_method="md_gost94", c14n_exclusive=True,
+        digest_method="sha1", c14n_exclusive=True,
         c14n_with_comments=False):
     """
     Soap envelope signing according to SMEV recommendations
