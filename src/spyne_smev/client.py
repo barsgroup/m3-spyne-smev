@@ -20,13 +20,20 @@ from spyne_smev.wsse import utils as _utils
 
 class Client(_SudsClient):
     """
-    Клиент suds, в котором перекрыта возможность форматирования xml.
-    Это необходимо для правильного вычисления подписей.
-    Если в параметрах указаны путь к файлу с подпиcью и пароль, то запросы
-    будут подписаны электронной подписью
+    Suds client which supports digital signing with XMLDSIG messages via
+    x509 token profile
 
-    :param unicode pem_fn: Путь к файлу с ЭЦП
-    :param unicode pem_pass: Пароль с ЭЦП
+    :param unicode private_key_path: File path to private key
+    :param unicode private_key_path: Private key passphrase
+    :param bytes private_key: Private key (either this or
+                               private_key_path required)
+    :param unicode certificate_path: File path to X509 certificate
+    :param bytes certificate: Certificate (either this or
+                               certificate_path required)
+    :param unicode incoming_certificate_path: File path to certificate which
+                                               allowed in incoming message
+    :param bytes incoming_certificate: Incoming certificate
+
     """
 
     IN = 1
@@ -36,21 +43,35 @@ class Client(_SudsClient):
     def __init__(
             self, url,
             private_key_path=None, private_key=None, private_key_pass=None,
-            certificate_path=None, certificate=None, digest_method="md_gost94",
+            certificate_path=None, certificate=None,
+            in_certificate_path=None, in_certificate=None,
+            digest_method="sha1",
             security_direction=BOTH, **kwargs):
+
+        if not security_direction in (self.IN, self.OUT, self.BOTH):
+            raise ValueError(
+                "direction should be constant either IN, OUT or BOTH!")
+
         kwargs["prettyxml"] = False
 
         self._private_key_path = private_key_path
         self._certificate_path = certificate_path
         self._certificate = certificate
         self._private_key = private_key
+        self._in_certificate_path = in_certificate_path
+        self._in_certificate = in_certificate
         self._digest_method = digest_method
+        self._security = None
+
+        if not any((self._in_certificate, self._in_certificate_path)):
+            self._in_certificate = self.certificate
 
         if self.certificate and self.private_key:
-            self._smev_security = _WsseSecurity(
+            self._security = _WsseSecurity(
                 self.private_key, private_key_pass or _crypto._ffi.NULL,
-                self.certificate, digest_method, security_direction)
-            kwargs.setdefault("plugins", []).append(self._smev_security)
+                self.certificate, self.in_certificate,
+                digest_method, security_direction)
+            kwargs.setdefault("plugins", []).append(self._security)
         super(Client, self).__init__(url, **kwargs)
 
     @property
@@ -68,22 +89,27 @@ class Client(_SudsClient):
         return self._certificate
 
     @property
+    def in_certificate(self):
+        if self._in_certificate is None and self._in_certificate_path:
+            with open(self._in_certificate_path) as fd:
+                self._in_certificate = fd.read()
+        return self._in_certificate
+
+    @property
     def last_verified(self):
-        return self._smev_security.last_verified
+        if self._security:
+            return self._security.last_verified
 
 
 class _WsseSecurity(_MessagePlugin):
 
     def __init__(self, private_key, private_key_password, certificate,
-                 digest_method="md_gost94", direction=Client.BOTH):
-
-        if not direction in (Client.IN, Client.OUT, Client.BOTH):
-            raise ValueError(
-                "direction should be constant either IN, OUT or BOTH!")
+                 in_certificate, digest_method, direction=Client.BOTH):
 
         self.private_key = private_key
         self.private_key_password = private_key_password
         self.certificate = certificate
+        self.in_certificate = in_certificate
         self.digest_method = digest_method
         self.direction = direction
         self._verified = None
@@ -112,7 +138,7 @@ class _WsseSecurity(_MessagePlugin):
             self._verified = False
             document = _etree.fromstring(context.reply)
             try:
-                _utils.verify_document(document, self.certificate)
+                _utils.verify_document(document, self.in_certificate)
                 self._verified = True
             except Exception, e:
                 logger.exception(e)
