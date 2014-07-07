@@ -7,7 +7,6 @@ spyne-smev - это набор протоколов фреймворка [spyne]
 для работы с системой межведомственного электронного взаимодействия или просто
 [СМЭВ](http://smev.gosuslugi.ru/>).
 
-
 ## REQUIREMENTS
 
 * lxml (манипуляции с xml документами)
@@ -15,21 +14,23 @@ spyne-smev - это набор протоколов фреймворка [spyne]
 * spyne (необходим для работы протоколов spyne)
 * suds (необходим только для работы клиента suds)
 
-
 ## INSTALLATION
 
 1. Сперва необходимо установить openssl и все сопутствующие ему библиотеки.
    Для различных операционных систем способ установки будет отличаться.
 
-   Установка на Ubuntu:
+    Установка на Ubuntu:
 
-    $ sudo apt-get install openssl libssl1.0.0 libssl-dev
+        $ sudo apt-get install openssl libssl1.0.0 libssl-dev
+
+1. Установка зависимостей
+
+        $ pip install https://github.com/timic/cryptography/archive/0.4.1.zip#egg=cryptography
 
 
-2. Установка библиотеки:
+1. Установка библиотеки:
 
-    $ pip install https://bitbucket.org/barsgroup/spyne-smev/get/tip.tar.gz
-
+        $ pip install https://bitbucket.org/barsgroup/spyne-smev/get/tip.tar.gz
 
 ## Использование
 
@@ -52,25 +53,30 @@ spyne-smev - это набор протоколов фреймворка [spyne]
 Пример создания django view для сервиса с применением подписи XMLDSIG:
 
     from spyne.application import Application
+    from spyne.decorator import rpc
     from spyne.server.django import DjangoApplication
+    from spyne.service import ServiceBase
+    from spyne.model.primitive import Integer
 
     from spyne_smev.wsse.protocols import Soap11WSSE, X509TokenProfile
 
-    in_security = X509TokenProfile(
-        private_key=in_private_key,
-        private_key_pass=in_password,
-        certificate=in_certificate,
+
+    class GetSumService(ServiceBase):
+
+        @rpc(Integer, Integer, _returns=Integer, _body_style="bare")
+        def Sum(ctx, A, B):
+            return A + B
+
+    in_security =  out_security = X509TokenProfile(
+        private_key=pkey,
+        private_key_pass=pkey_pass,
+        certificate=cert,
         digest_method="sha1")
     in_protocol = Soap11WSSE(wsse_security=in_security)
-    out_security = X509TokenProfile(
-        private_key=out_private_key,
-        private_key_pass=out_password,
-        certificate=out_certificate,
-        digest_method="sha1")
     out_protocol = Soap11WSSE(wsse_security=out_security)
 
     application = Application(
-        [MyServiceBase], "http://my-domain.site/tns",
+        [GetSumService], "http://my-domain.site/tns",
         in_protocol=in_protocol,
         out_protocol=out_protocol)
     service_view = DjangoApplication(application)
@@ -80,25 +86,42 @@ spyne-smev - это набор протоколов фреймворка [spyne]
 
 По [методическим рекомендациям](http://smev.gosuslugi.ru/portal/api/files/get/27403)
 СМЭВ все сообщения должны быть подписаны электронной подписью.
+Класс `BaseSmev` расширяет протокол `Soap11WSSE`, таким образом, что
+при формировании ответа, содержимое soap message встраивается в блок элемента
+СМЭВ MessageData/AppData, а при разборе входящего наоборот, содержимое AppData
+вставляется в Body сообщения, а элементы СМЭВ Header, Message и AppDocument
+выкидывается из сообщения, разбираются отдельно и записываются в контекст
+spyne в специальный объект udc (user defined data).
 
 Пример:
 
-    from spyne.application import Application
-    from spyne.server.django import DjangoApplication
+    from spyne.decorator import rpc
+    from spyne.service import ServiceBase
+    from spyne.model.primitive import Integer, Unicode
+    from spyne.model.complex import Iterable
 
+    from spyne_smev.application import Application
+    from spyne_smev.server.django import DjangoApplication
     from spyne_smev.smev256 import Smev256
     from spyne_smev.wsse.protocols import X509TokenProfile
 
-    in_security = X509TokenProfile(
-        private_key=in_private_key,
-        private_key_pass=in_password,
-        certificate=in_certificate,
-        digest_method="md_gost94")
-    out_security = X509TokenProfile(
-        private_key=out_private_key,
-        private_key_pass=out_password,
-        certificate=out_certificate,
-        digest_method="md_gost94")
+
+    class PingSmevService(ServiceBase):
+
+        @rpc(Integer, _returns=Iterable(Unicode))
+        def Ping(ctx, Times):
+            (
+                "Hello {0}! You requested service {1} with version {2}".format(
+                    ctx.udc.in_smev_message.Sender.Name,
+                    ctx.udc.in_smev_message.Service.Mnemonic,
+                    ctx.udc.in_smev_message.Service.Version)
+            )
+
+    in_security = out_security = X509TokenProfile(
+        private_key=pkey,
+        private_key_pass=pkey_pass,
+        certificate=cert,
+        digest_method="sha1")
 
     in_protocol = Smev256(wsse_security=in_security)
     out_protocol = Smev256(
@@ -110,6 +133,16 @@ spyne-smev - это набор протоколов фреймворка [spyne]
         Mnemonic="123456789",
         Version="1.00")
 
+    application = Application(
+        [PingSmevService], "http://my-domain.site/tns",
+        in_protocol=in_protocol,
+        out_protocol=out_protocol)
+    service_view = DjangoApplication(application)
+
+
+*Регистрация сервиса с валидной СМЭВ-схемой в wsdl требует использования
+классов `Application`, `WsgiApplication` и `DjangoApplication` из библиотеки
+spyne_smev вместо spyne. Это поведение в дальнейшем может изменится.*
 
 ### Клиент
 
@@ -121,8 +154,47 @@ spyne-smev - это набор протоколов фреймворка [spyne]
 а так же добавлен плагин подписи и верификации сообщений, работающий аналогично
 профилю `X509TokenProfile`.
 
-Пример:
+Примеры:
 
+    # для сервиса GetSumService
+    from spyne_smev.client import Client
+
+    client = Client(
+        "http://url_to_get_sum_service?wsdl",
+        private_key=pkey, private_key_pass=pkey_pass,
+        certificate=cert, in_certificate=cert, digest_method="sha1")
+
+    response = client.service.Sum(A=3, B=5)
+    if client.last_verified:
+        print("A + B =", response.Sum)
+        # 8
+    else:
+        raise ValueError("Response signature didn't pass validation")
+
+
+    # для сервиса PingSmevService
+    client = Client(
+        "http://url_to_ping_smev_service?wsdl",
+        private_key=pkey, private_key_pass=pkey_pass,
+        certificate=cert, in_certificate=cert, digest_method="sha1")
+    msg = client.factory.create("Ping")
+    msg.Message.Sender.Name = "PORTAL"
+    msg.Message.Service.Mnemonic = "123456789"
+    msg.Message.Service.Version = "0.34"
+    msg.MessageData.AppData.Times = 3
+
+    # чтобы пример не был большим остальные атрибуты были пропущены
+    ...
+
+    result = client.service.Ping(msg.Message, msg.MessageData)
+    print("\n".join(result.MessageData.AppData.Iterable))
+    # Hello PORTAL! You requested service 123456789 with version 0.34
+    # Hello PORTAL! You requested service 123456789 with version 0.34
+    # Hello PORTAL! You requested service 123456789 with version 0.34
+
+
+Подробные примеры можно посмотреть
+[тут](https://bitbucket.org/barsgroup/spyne-smev/src/tip/src/examples/?at=default).
 
 ## LIMITATIONS
 
@@ -130,6 +202,5 @@ spyne-smev - это набор протоколов фреймворка [spyne]
 * Пока не поддерживаются ссылки на вложения в AppDocument, а так же не
   реализовано api для упаковки файлов в BinaryData согласно рекомендациям
   (пока все делаем ручками)
-* Клиент для подписи и верификации использует один сертификат (скорее это бага)
 
 ## LICENCE
