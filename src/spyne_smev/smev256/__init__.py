@@ -141,7 +141,7 @@ class Smev256(BaseSmev):
 
     def _create_message_data_element(self, ctx):
         """
-        Конструрирует болванку для MessageData
+        Конструирует болванку для MessageData
 
         :rtype: lxml.etree.Element
         """

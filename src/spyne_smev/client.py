@@ -14,7 +14,8 @@ from suds.client import Client as _SudsClient
 from suds.plugin import MessagePlugin as _MessagePlugin
 from suds.sax.parser import Parser as _Parser
 
-from spyne_smev import wsse as _wsse, crypto as _crypto
+from spyne_smev import crypto as _crypto
+from spyne_smev.wsse import utils as _utils
 
 
 class Client(_SudsClient):
@@ -92,7 +93,7 @@ class _WsseSecurity(_MessagePlugin):
             logger.debug("Signing document ...")
             document = _etree.fromstring(context.envelope.plain())
             try:
-                out_document = _wsse.sign_document(
+                out_document = _utils.sign_document(
                     document, self.certificate, self.private_key,
                     self.private_key_password, self.digest_method)
             except Exception, e:
@@ -111,7 +112,7 @@ class _WsseSecurity(_MessagePlugin):
             self._verified = False
             document = _etree.fromstring(context.reply)
             try:
-                _wsse.verify_document(document, self.certificate)
+                _utils.verify_document(document, self.certificate)
                 self._verified = True
             except Exception, e:
                 logger.exception(e)

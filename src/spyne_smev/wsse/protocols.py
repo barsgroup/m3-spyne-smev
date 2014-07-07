@@ -36,8 +36,7 @@ class X509TokenProfile(BaseWSS):
             private_key_path=None, private_key=None, private_key_pass=None,
             certificate_path=None, certificate=None,
             digest_method="md_gost94",
-            exclusive_c14n=True, c14n_with_comments=False,
-            c14n_inclusive_prefixes=None):
+            exclusive_c14n=True, c14n_with_comments=False):
 
         assert private_key_path or private_key, (
             "Either `private_key_path` or `private_key` should be defined")
@@ -52,7 +51,6 @@ class X509TokenProfile(BaseWSS):
         self.digest_method = digest_method
 
         self._c14n = _c14n_nsmap.get((exclusive_c14n, c14n_with_comments))
-        self._inclusive_prefixes = c14n_inclusive_prefixes
 
     @property
     def private_key(self):
