@@ -34,7 +34,7 @@ spyne-smev - это набор протоколов фреймворка [spyne]
 
 ## Использование
 
-Модуль предоставляет набор классов расширяющих возможности базового протокола
+spyne-smev предоставляет набор классов расширяющих возможности базового протокола
 фреймворка spyne - `Soap11`.
 
 ### WS-Security
@@ -48,7 +48,7 @@ spyne-smev - это набор протоколов фреймворка [spyne]
 
 `X509TokenProfile`, профиль который реализует механизм подписи
 [XMLDSIG](http://www.w3.org/TR/xmldsig-core) по спецификации
-[x509 token profile](http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0.pdf)
+[x509 token profile](http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0.pdf).
 
 Пример создания django view для сервиса с применением подписи XMLDSIG:
 
@@ -110,11 +110,12 @@ spyne в специальный объект udc (user defined data).
 
         @rpc(Integer, _returns=Iterable(Unicode))
         def Ping(ctx, Times):
-            (
+            return (
                 "Hello {0}! You requested service {1} with version {2}".format(
                     ctx.udc.in_smev_message.Sender.Name,
                     ctx.udc.in_smev_message.Service.Mnemonic,
                     ctx.udc.in_smev_message.Service.Version)
+                for _ in xrange(Times)
             )
 
     in_security = out_security = X509TokenProfile(
