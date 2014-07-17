@@ -7,11 +7,13 @@ spyne-smev - это набор протоколов фреймворка [spyne]
 для работы с системой межведомственного электронного взаимодействия или просто
 [СМЭВ](http://smev.gosuslugi.ru/>).
 
+
+
 ## REQUIREMENTS
 
 * lxml (манипуляции с xml документами)
 * cryptography (биндинг к libssl)
-* spyne (необходим для работы протоколов spyne)
+* spyne (необходим для работы протоколов spyne; необязательный, если нужен только клиент)
 * suds (необходим только для работы клиента suds)
 
 ## INSTALLATION
@@ -22,11 +24,6 @@ spyne-smev - это набор протоколов фреймворка [spyne]
     Установка на Ubuntu:
 
         $ sudo apt-get install openssl libssl1.0.0 libssl-dev
-
-1. Установка зависимостей
-
-        $ pip install https://github.com/timic/cryptography/archive/0.4.1.zip#egg=cryptography
-
 
 1. Установка библиотеки:
 
