@@ -6,3 +6,6 @@ dist/*
 build/*
 MANIFEST
 src/wsfactory/schema/config.xml
+.project
+.pydevproject
+.settings

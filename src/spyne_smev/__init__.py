@@ -7,4 +7,4 @@ __init__.py.py
 :Author: timic
 """
 from spyne_smev.smev256 import Smev256
-from spyne_smev.wsse import Soap11WSSE, X509TokenProfile
+from spyne_smev.wsse.protocols import Soap11WSSE, X509TokenProfile

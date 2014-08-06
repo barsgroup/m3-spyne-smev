@@ -216,6 +216,9 @@ def _load_private_key(pem_buffer, pass_phrase=_ffi.NULL):
     if isinstance(pem_buffer, _utils.text_type):
         pem_buffer = pem_buffer.encode("ascii")
 
+    if isinstance(pass_phrase, _utils.text_type):
+        pass_phrase = pem_buffer.encode("ascii")
+
     bio = _new_mem_buf(pem_buffer)
 
     evp_pkey = _lib.PEM_read_bio_PrivateKey(
