@@ -1,2 +1,2 @@
 lxml
-cryptography>=0.4
+cryptography>=0.5

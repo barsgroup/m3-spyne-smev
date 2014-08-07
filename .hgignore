@@ -1,11 +1,10 @@
 \.pyc$
 demo/*
 .idea/*
-src/wsfactory/schema/log/*
 dist/*
 build/*
 MANIFEST
-src/wsfactory/schema/config.xml
 .project
 .pydevproject
 .settings
+src/spyne_smev.egg-info
