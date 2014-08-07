@@ -8,13 +8,26 @@ import datetime
 import os
 
 from lxml import etree
-from spyne.protocol.xml.model import complex_from_element
 
 from .._base import BaseSmev, BaseSmevWsdl
 from .._utils import Cap, el_name_with_ns
 from spyne_smev import _xmlns as ns
 
 from model import MessageType, ServiceType, HeaderType, AppDocument
+
+try:
+    from spyne.protocol.xml.model import complex_from_element as _spyne_cfe
+except ImportError:
+
+    # spyne>=2.11.0
+    def _complex_from_element(proto, ctx, typeCls, el):
+        return proto.complex_from_element(ctx, typeCls, el)
+
+else:
+
+    # spyne<=2.10.10
+    def _complex_from_element(proto, ctx, typeCls, el):
+        return _spyne_cfe(proto, typeCls, el)
 
 
 class Smev256Wsdl(BaseSmevWsdl):
@@ -45,16 +58,17 @@ class Smev256(BaseSmev):
         body_response.append(message_data)
 
     def create_in_smev_objects(self, ctx):
-        ctx.udc.in_smev_message = complex_from_element(
-            self, MessageType, ctx.udc.in_smev_message_document)
+
+        ctx.udc.in_smev_message = _complex_from_element(
+            self, ctx, MessageType, ctx.udc.in_smev_message_document)
         if ctx.udc.in_smev_header_document:
-            ctx.udc.in_smev_header = complex_from_element(
-                self, HeaderType, ctx.udc.in_smev_header_document)
+            ctx.udc.in_smev_header = _complex_from_element(
+                self, ctx, HeaderType, ctx.udc.in_smev_header_document)
         else:
             ctx.udc.in_smev_header = HeaderType()
         if ctx.udc.in_smev_appdoc_document:
-            ctx.udc.in_smev_appdoc = complex_from_element(
-                self, AppDocument, ctx.udc.in_smev_appdoc_document)
+            ctx.udc.in_smev_appdoc = _complex_from_element(
+                self, ctx, AppDocument, ctx.udc.in_smev_appdoc_document)
         else:
             ctx.udc.in_smev_appdoc = AppDocument()
         ctx.udc.out_smev_message = MessageType(
