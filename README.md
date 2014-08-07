@@ -7,8 +7,7 @@ spyne-smev - это набор протоколов фреймворка [spyne]
 для работы с системой межведомственного электронного взаимодействия или просто
 [СМЭВ](http://smev.gosuslugi.ru/>).
 
-
-
+Так же добавляет проверки безопасности в протокол Soap 1.1, основанные на рекомендацияx [WSSecurity](https://www.oasis-open.org/committees/download.php/16790/wss-v1.1-spec-os-SOAPMessageSecurity.pdf) (пока реализован только частично X509TokenProfile 1.1).
 ## REQUIREMENTS
 
 * lxml (манипуляции с xml документами)
