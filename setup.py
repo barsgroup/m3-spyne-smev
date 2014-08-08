@@ -20,5 +20,5 @@ setup(
     author="Timur Salyakhutdinov",
     author_email="t.salyakhutdinov@gmail.com",
     install_requires=read_file("REQUIREMENTS")
-
 )
+
