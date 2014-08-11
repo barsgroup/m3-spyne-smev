@@ -17,16 +17,16 @@ spyne-smev - это набор протоколов фреймворка [spyne]
 
 ## INSTALLATION
 
-1. Сперва необходимо установить openssl и все сопутствующие ему библиотеки.
+* Сперва необходимо установить openssl и все сопутствующие ему библиотеки.
    Для различных операционных систем способ установки будет отличаться.
 
     Установка на Ubuntu:
 
         $ sudo apt-get install openssl libssl1.0.0 libssl-dev
 
-1. Установка библиотеки:
+* Установка библиотеки:
 
-        $ pip install https://bitbucket.org/barsgroup/spyne-smev/get/tip.tar.gz
+        $ pip install spyne-smev -i http://pypi.bars-open.ru/simple/
 
 ## Использование
 
