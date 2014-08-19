@@ -17,42 +17,8 @@ from spyne.model.fault import Fault as _Fault
 
 import _utils
 import _xmlns as _ns
-from spyne_smev.wsse.protocols import Soap11WSSE
-
-
-class ApiError(_Fault):
-    """
-    Специальный exception, который может быть возбужден в api-методе.
-
-    Специальным образом обрабатывается в потомках исходящего протокола
-    Soap11WSSE: вместо Fault в body soap-конверта кладется вызываемый
-    soap-message c элементом Error внутри.
-
-    В остальных протоколах вёдет себя как обычный Fault
-
-    TODO: пока необходимо явно передавать имя api-метода в котором возбуждается
-    исключение
-    """
-
-    detail = None
-    faultactor = "Server"
-
-    def __init__(
-            self, errorCode, errorMessage, messageName):
-        self.errorCode = errorCode
-        self.errorMessage = errorMessage
-        self.messageName = messageName
-
-    @property
-    def faultcode(self):
-        return self.errorCode
-
-    @property
-    def faultstring(self):
-        return self.errorMessage
-
-    def __repr__(self):
-        return u"Error({0}: {1})".format(self.errorCode, self.errorMessage)
+from wsse.protocols import Soap11WSSE
+from fault import ApiError as _ApiError
 
 
 class BaseSmev(Soap11WSSE):
@@ -118,7 +84,7 @@ class BaseSmev(Soap11WSSE):
     def serialize(self, ctx, message):
         super(BaseSmev, self).serialize(ctx, message)
         if ctx.out_error is None or issubclass(
-                ctx.out_error.__class__, ApiError):
+                ctx.out_error.__class__, _ApiError):
             self.construct_smev_envelope(ctx, message)
 
     def _validate_smev_element(self, element):
@@ -132,8 +98,9 @@ class BaseSmev(Soap11WSSE):
                 "Message didn't pass validation checks!"
                 " Errors:\n{0}".format(errors))
 
+    # method version for spyne<2.11.0
     def to_parent_element(self, cls, value, tns, parent_elt, *args, **kwargs):
-        if issubclass(cls, ApiError):
+        if issubclass(cls, _ApiError):
             message = _etree.SubElement(
                 parent_elt, "{{{0}}}{1}".format(tns, value.messageName))
             error = _etree.SubElement(message, "{{{0}}}{1}".format(tns, "Error"))
@@ -146,6 +113,22 @@ class BaseSmev(Soap11WSSE):
         else:
             super(BaseSmev, self).to_parent_element(
                 cls, value, tns, parent_elt, *args, **kwargs)
+
+    # method version for spyne>=2.11.0
+    def to_parent(self, ctx, cls, inst, parent, ns, *args, **kwargs):
+        if issubclass(cls, _ApiError):
+            message = _etree.SubElement(
+                parent, "{{{0}}}{1}".format(ns, inst.messageName))
+            error = _etree.SubElement(message, "{{{0}}}{1}".format(ns, "Error"))
+            _etree.SubElement(
+                error, "{{{0}}}{1}".format(ns, "errorCode")
+            ).text = inst.errorCode
+            _etree.SubElement(
+                error, "{{{0}}}{1}".format(ns, "errorMessage")
+            ).text = inst.errorMessage
+        else:
+            return super(BaseSmev, self).to_parent(
+                ctx, cls, inst, parent, ns, *args, **kwargs)
 
     def construct_smev_envelope(self, ctx, message):
         """
