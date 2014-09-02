@@ -6,7 +6,7 @@
            elementFormDefault="qualified" attributeFormDefault="unqualified"
            version="2.5.3">
     <xs:import namespace="http://www.w3.org/2004/08/xop/include"
-               schemaLocation="http://www.w3.org/2004/08/xop/include"/>
+               schemaLocation="xop-include.xsd"/>
     <xs:element name="Header" type="smev:HeaderType">
         <xs:annotation>
             <xs:documentation>Служебный загловок СМЭВ</xs:documentation>

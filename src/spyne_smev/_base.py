@@ -9,6 +9,7 @@ _base.py
 import logging as _logging
 logger = _logging.getLogger(__name__)
 
+import os
 
 from lxml import etree as _etree
 
@@ -162,6 +163,7 @@ class BaseSmevWsdl(_Wsdl11):
         smev_schema = self._get_smev_schema().getroot()
         smev_schema = _utils.copy_with_nsmap(
             smev_schema, dict(tns=self._ns["tns"]))
+
         messages = self.root_elt.xpath(
             "./wsdl:portType/wsdl:operation/wsdl:input/@message | "
             "./wsdl:portType/wsdl:operation/wsdl:output/@message",
@@ -189,6 +191,20 @@ class BaseSmevWsdl(_Wsdl11):
         self.root_elt.find(
             "./{{{0}}}types".format(_ns.wsdl)).insert(0, smev_schema)
         tns_schema.getparent().replace(tns_schema, new_tns_schema)
+
+        import_xop_include = smev_schema.find(
+            "{{{0}}}import"
+            "[@namespace='http://www.w3.org/2004/08/xop/include']"
+            .format(_ns.xs)
+        )
+        if import_xop_include is not None:
+            import_xop_include.attrib.pop("schemaLocation")
+            xop_include_schema = _utils.load_xml(
+                os.path.join(
+                    os.path.dirname(__file__), "xsd", "xop-include.xsd")
+            ).getroot()
+            self.root_elt.find("./{{{0}}}types".format(_ns.wsdl)).insert(
+                0, xop_include_schema)
 
         self._add_smev_headers(self.root_elt)
         self._Wsdl11__wsdl = _etree.tostring(
