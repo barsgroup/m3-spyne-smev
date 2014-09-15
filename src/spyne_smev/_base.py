@@ -51,7 +51,7 @@ class BaseSmev(Soap11WSSE):
         super(BaseSmev, self).create_in_document(ctx, charset)
         in_document, _ = ctx.in_document
         if ctx.udc is None:
-            ctx.udc = _utils.Cap()
+            ctx.udc = _utils.EmptyCtx()
         ctx.udc.in_smev_header_document = in_document.find(
             ".//{{{smev}}}Header".format(**self._ns))
         ctx.udc.in_smev_message_document = in_document.find(

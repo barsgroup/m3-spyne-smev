@@ -16,10 +16,10 @@ from spyne.model.complex import ComplexModelMeta, ComplexModelBase
 el_name_with_ns = lambda ns: lambda el: '{%s}%s' % (ns, el)
 
 
-class Cap(object):
+class EmptyCtx(object):
 
     def __getattr__(self, name):
-        return self.__dict__.get(name, Cap())
+        return self.__dict__.get(name, EmptyCtx())
 
     def __nonzero__(self):
         return False

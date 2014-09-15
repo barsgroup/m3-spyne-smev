@@ -10,7 +10,7 @@ import os
 from lxml import etree
 
 from .._base import BaseSmev, BaseSmevWsdl
-from .._utils import Cap, el_name_with_ns
+from .._utils import EmptyCtx, el_name_with_ns
 from spyne_smev import _xmlns as ns
 
 from model import MessageType, ServiceType, HeaderType, AppDocument
@@ -85,10 +85,13 @@ class Smev256(BaseSmev):
         :param ctx: Сквозной контекст метода
         :rtype: lxml.etree.Element
         """
+
+        # TODO: сделать нормальный биндинг
+
         if getattr(ctx, "udc", None) is None:
-            ctx.udc = Cap()
+            ctx.udc = EmptyCtx()
         if not getattr(ctx.udc, "out_smev_message", None):
-            ctx.udc.out_smev_object = Cap()
+            ctx.udc.out_smev_message = EmptyCtx()
 
         SMEV = el_name_with_ns(self._ns["smev"])
 
@@ -120,7 +123,7 @@ class Smev256(BaseSmev):
             service, SMEV("Mnemonic")).text = self.smev_params.get(
                 "Mnemonic", "")
         etree.SubElement(service, SMEV("Version")).text = self.smev_params.get(
-            "Version", "")
+            "Version", "1.00")
         etree.SubElement(root, SMEV(
             "TypeCode")).text = ctx.udc.out_smev_message.TypeCode or "GSRV"
         etree.SubElement(root, SMEV(
@@ -130,19 +133,25 @@ class Smev256(BaseSmev):
         etree.SubElement(
             root, SMEV("ExchangeType")).text = self.smev_params.get(
                 "ExchangeType", "0")
-        if ctx.udc.out_smev_message.RequestIdRef:
+
+        request_id_ref = (
+            ctx.udc.out_smev_message.RequestIdRef
+            or ctx.udc.in_smev_header.MessageId)
+        if request_id_ref:
+            etree.SubElement(root, SMEV("RequestIdRef")).text = request_id_ref
+        origin_request_id_ref = (
+            ctx.udc.out_smev_message.OriginRequestIdRef or
+            ctx.udc.in_smev_message.OriginRequestIdRef or request_id_ref)
+        if origin_request_id_ref:
             etree.SubElement(
-                root, SMEV("RequestIdRef")
-            ).text = ctx.udc.out_smev_message.RequestIdRef or ""
-        if ctx.udc.out_smev_message.OriginRequestIdRef:
-            etree.SubElement(
-                root, SMEV("OriginRequestIdRef")
-            ).text = ctx.udc.out_smev_message.OriginRequestIdRef or ""
-        if "ServiceCode" in self.smev_params:
-            etree.SubElement(
-                root, SMEV("ServiceCode")
-            ).text = self.smev_params.get(
-                "ServiceCode", "")
+                root, SMEV("OriginRequestIdRef")).text = origin_request_id_ref
+
+        service_code = (
+            ctx.udc.out_smev_message.ServiceCode
+            or self.smev_params.get("ServiceCode"))
+        if service_code:
+            etree.SubElement(root, SMEV("ServiceCode")).text = service_code
+
         if ctx.udc.out_smev_message.CaseNumber:
             etree.SubElement(
                 root, SMEV("CaseNumber")
@@ -150,6 +159,11 @@ class Smev256(BaseSmev):
         if "OKTMO" in self.smev_params:
             etree.SubElement(
                 root, SMEV("OKTMO")).text = self.smev_params.get("OKTMO", "")
+        test_msg = (
+            ctx.udc.out_smev_message.TestMsg
+            or ctx.udc.in_smev_message.TestMsg or None)
+        if test_msg:
+            etree.SubElement(root, SMEV("TestMsg")).text = test_msg
 
         return root
 
