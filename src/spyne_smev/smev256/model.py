@@ -74,6 +74,7 @@ class MessageType(SmevModel):
     ServiceCode = Unicode(type_name="ServiceCode", max_occurs=1)
     CaseNumber = Unicode(type_name="CaseNumber", max_occurs=1)
     SubMessages = SubMessages(type_name="SubMessages", max_occurs=1)
+    TestMsg = Unicode(type_name="TestMsg", max_occurs=1)
 
 
 class HeaderType(SmevModel):
