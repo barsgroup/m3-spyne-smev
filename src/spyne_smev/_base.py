@@ -87,6 +87,7 @@ class BaseSmev(Soap11WSSE):
         if ctx.out_error is None or issubclass(
                 ctx.out_error.__class__, _ApiError):
             self.construct_smev_envelope(ctx, message)
+            self.event_manager.fire_event("after_serialize_smev", ctx)
 
     def _validate_smev_element(self, element):
         self._smev_schema = self._smev_schema or _utils.load_schema(
