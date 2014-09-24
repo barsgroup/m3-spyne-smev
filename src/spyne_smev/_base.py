@@ -15,6 +15,7 @@ from lxml import etree as _etree
 
 from spyne.interface.wsdl.wsdl11 import Wsdl11 as _Wsdl11
 from spyne.model.fault import Fault as _Fault
+from spyne.const.http import HTTP_200
 
 import _utils
 import _xmlns as _ns
@@ -84,8 +85,7 @@ class BaseSmev(Soap11WSSE):
 
     def serialize(self, ctx, message):
         super(BaseSmev, self).serialize(ctx, message)
-        if ctx.out_error is None or issubclass(
-                ctx.out_error.__class__, _ApiError):
+        if ctx.out_error is None or isinstance(ctx.out_error, _ApiError):
             self.construct_smev_envelope(ctx, message)
             self.event_manager.fire_event("after_serialize_smev", ctx)
 
@@ -140,6 +140,11 @@ class BaseSmev(Soap11WSSE):
 
     def create_in_smev_objects(self, ctx):
         raise NotImplementedError()
+
+    def fault_to_http_response_code(self, fault):
+        if isinstance(fault, _ApiError):
+            return HTTP_200
+        return super(BaseSmev, self).fault_to_http_response_code(fault)
 
 
 class BaseSmevWsdl(_Wsdl11):

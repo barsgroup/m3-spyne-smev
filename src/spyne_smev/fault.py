@@ -22,16 +22,22 @@ class ApiError(_Fault):
 
     TODO: пока необходимо явно передавать имя api-метода в котором возбуждается
     исключение
+
+    :param basestring errorCode: Код ошибки
+    :param basestring errorMessage: Текст ошибки
+    :param str messageName: имя api-метода, не может быть пустым
+    :param str Status: INVALID, REJECT etc.
     """
 
     detail = None
     faultactor = "Server"
 
     def __init__(
-            self, errorCode, errorMessage, messageName):
+            self, errorCode, errorMessage, messageName, Status="INVALID"):
         self.errorCode = errorCode
         self.errorMessage = errorMessage
         self.messageName = messageName
+        self.Status = Status
 
     @property
     def faultcode(self):

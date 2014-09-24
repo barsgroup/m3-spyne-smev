@@ -11,7 +11,8 @@ from lxml import etree
 
 from .._base import BaseSmev, BaseSmevWsdl
 from .._utils import EmptyCtx, el_name_with_ns
-from spyne_smev import _xmlns as ns
+from .. fault import ApiError as _ApiError
+from .. import _xmlns as ns
 
 from model import MessageType, ServiceType, HeaderType, AppDocument
 
@@ -126,8 +127,13 @@ class Smev256(BaseSmev):
             "Version", "1.00")
         etree.SubElement(root, SMEV(
             "TypeCode")).text = ctx.udc.out_smev_message.TypeCode or "GSRV"
+        if ctx.out_error and isinstance(ctx.out_error, _ApiError):
+            status = getattr(ctx.out_error, "Status", None) or "INVALID"
+        else:
+            status = "RESULT"
+
         etree.SubElement(root, SMEV(
-            "Status")).text = ctx.udc.out_smev_message.Status or "RESULT"
+            "Status")).text = ctx.udc.out_smev_message.Status or status
         etree.SubElement(
             root, SMEV("Date")).text = datetime.datetime.utcnow().isoformat()
         etree.SubElement(
