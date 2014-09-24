@@ -7,7 +7,7 @@ def read_file(name):
         return fd.read()
 
 setup(
-    name="spyne-smev",
+    name="m3-spyne-smev",
     version="0.1.4",
     packages=[
         "spyne_smev", "spyne_smev.smev256", "spyne_smev.smev255",
@@ -19,6 +19,16 @@ setup(
     description=read_file("DESCRIPTION"),
     author="Timur Salyakhutdinov",
     author_email="t.salyakhutdinov@gmail.com",
-    install_requires=read_file("REQUIREMENTS")
+    install_requires=read_file("REQUIREMENTS"),
+    classifiers=[
+        'Intended Audience :: Developers',
+        'Environment :: Web Environment',
+        'Natural Language :: Russian',
+        'Natural Language :: English',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'License :: OSI Approved :: MIT License',
+        'Development Status :: 5 - Production/Stable',
+],
 )
 
