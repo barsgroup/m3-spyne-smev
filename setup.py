@@ -7,7 +7,7 @@ def read_file(name):
         return fd.read()
 
 setup(
-    name="m3-spyne-smev",
+    name="spyne-smev",
     version="0.1.4",
     packages=[
         "spyne_smev", "spyne_smev.smev256", "spyne_smev.smev255",
