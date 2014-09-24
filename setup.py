@@ -8,7 +8,7 @@ def read_file(name):
 
 setup(
     name="spyne-smev",
-    version="0.1.4",
+    version="0.1.5",
     packages=[
         "spyne_smev", "spyne_smev.smev256", "spyne_smev.smev255",
         "spyne_smev.server", "spyne_smev.wsse"],
