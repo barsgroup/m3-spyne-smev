@@ -3,9 +3,9 @@
 
 ## ABOUT
 
-spyne-smev - это набор протоколов фреймворка [spyne](http://spyne.io/>)
+spyne-smev - это набор протоколов фреймворка [spyne](http://spyne.io/)
 для работы с системой межведомственного электронного взаимодействия или просто
-[СМЭВ](http://smev.gosuslugi.ru/>).
+[СМЭВ](http://smev.gosuslugi.ru/).
 
 Так же добавляет проверки безопасности в протокол Soap 1.1, основанные на рекомендацияx [WSSecurity](https://www.oasis-open.org/committees/download.php/16790/wss-v1.1-spec-os-SOAPMessageSecurity.pdf) (пока реализован только частично X509TokenProfile 1.1).
 ## REQUIREMENTS
@@ -145,7 +145,7 @@ spyne_smev вместо spyne. Это поведение в дальнейшем
 
 В качестве клиента используется suds с небольшими дополнениями, речь о которых
 пойдет дальше. О том как устроен и работает suds можно почитать в официальной
-документации к [suds](link_to_suds_documentation).
+документации к [suds](https://fedorahosted.org/suds/wiki/Documentation).
 
 В классе `spyne_smev.client.Client` запрещено форматирование `prettyxml`,
 а так же добавлен плагин подписи и верификации сообщений, работающий аналогично
