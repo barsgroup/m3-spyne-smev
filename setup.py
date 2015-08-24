@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 from distutils.core import setup
 
@@ -8,7 +9,7 @@ def read_file(name):
 
 setup(
     name="spyne-smev",
-    version="0.1.5",
+    version="0.1.6",
     packages=[
         "spyne_smev", "spyne_smev.smev256", "spyne_smev.smev255",
         "spyne_smev.server", "spyne_smev.wsse"],
@@ -29,6 +30,5 @@ setup(
         'Programming Language :: Python',
         'License :: OSI Approved :: MIT License',
         'Development Status :: 5 - Production/Stable',
-],
+    ],
 )
-
