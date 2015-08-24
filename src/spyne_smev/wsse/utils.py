@@ -133,7 +133,7 @@ def _construct_wsse_header(
     sec_token_ref = _etree.SubElement(key_info, wsse("SecurityTokenReference"))
     _etree.SubElement(
         sec_token_ref, wsse("Reference"),
-        URI=cert_id,
+        URI="#{0}".format(cert_id),
         ValueType=_xmlns.x509_token_profile)
 
     return root
