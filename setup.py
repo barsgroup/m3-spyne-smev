@@ -7,7 +7,7 @@ with open('REQUIREMENTS', 'r') as f:
     requires.extend(f.readlines())
 
 setup(
-    name="spyne-smev",
+    name="m3-spyne-smev",
     version="0.1.6",
     url="http://bitbucket.org/bars-group/spyne-smev",
     license='MIT',
