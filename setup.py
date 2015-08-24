@@ -3,7 +3,7 @@ from distutils.core import setup
 
 
 requires = []
-with open('src/REQUIREMENTS', 'r') as f:
+with open('REQUIREMENTS', 'r') as f:
     requires.extend(f.readlines())
 
 setup(
