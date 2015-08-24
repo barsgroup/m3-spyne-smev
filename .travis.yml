@@ -1,21 +1,21 @@
+script: true
 notifications: 
   hipchat: 
-    template: 
-    - "%{repository}#%{build_number} (%{branch} - %{commit} : %{author}): %{message}"
     rooms: 
     - b7098c17bc3283dc7ca388b68e3ca3@m3
     format: html
-install: true
+    template: 
+    - "%{repository}#%{build_number} (%{branch} - %{commit} : %{author}): %{message}"
 python: 
 - "2.7"
-deploy: 
-  distributions: sdist
-  on: 
-    tags: true
-    all_branches: true
-  password: 
-    secure: EkfjfFra6/i3otmXthO1kyrNh2n8ahm14QyKCx4AfX8ES2/vncWl8VcBToerwGu6AyrUyxOe1OCfaAIk/0emJgfqHF0X29X3yI1R/qZlV7/ZmnuH0oCJSuOvbgI70B0U8nkAgQj7ctnRPBAGVpEYKFAh556fcpkRgBqXO9ZxGZoc/YjFvxEIkJIwcj7iXyJW3/QLzMb6JwNYA0RmBQieJRQ/9ctKcQVZXK1k25R+vBibSzPOQRV7SfE8cgWQ8RtEffmJgQpTZlzh29iXAvbSPUXMMhduBAP6py1cERJqkGaX8iaRd7kwk8lTIZhyjdVioxhCCUvXH+redrqA0vxlMX2IDeHEieJPaJAeeBhNSEgH+BkXExa7SmNhVoWkkJDC3wnx2KqfJIF6LXWRj+U1L+zAHkRWaepfv/h6IzW6hatw3PMxGEfStE2lNKrdKl8VsvoaIyiNK5UBMKWvnBl7qH7Bte0anI3KSeZo9AVmrkIm/T9ayQjFIOy5TzaXoh+92IXePlFTuuGltxWm88ctpBt9xCLOKPuPoNtQjKOJeb3ysx/BlWM0oJplt5TOXI1zyCgFqqTW0cDSYpkI6xk/i3nKZIPkl8dTn0W2ge5HJDY2XhMu2ZmAz5dyP4cpYqyICUfs1Jx4QY9eTqOJFHfkPbP5vPBoOqOkv1sKbENbkxY=
-  user: bars-travis
-  provider: pypi
-script: true
 language: python
+deploy: 
+  password: 
+    secure: E8JdAZgZ/J1UfMUEhi9fkHW88QbQ3UsA+/hhNPrOqg3kMnyQBAPNccRcc0wirdA+wBLG7M6h04tdP8OOJNg/7uuxkXGs+3J743YyiXBGz0hkesq3Zq9bdeNeDkYkrz8SEA4bgBh3u0nAjwZbOeJgCZtc5aGd1ZMgZErEwB2BJMf6aVuT43BLf3U6dMgwyWsh8iSIRUQrtu/tDrhzIjeJEiCrFlrBDrcWUkMZLAVKsYAgWyjFuL5Rsk5OpzHSiftymde14qGexrOpXesofQLKaQShMBjk2vwJgaOqIeY0Nmd2l8PIWvn1unEmO5s+zKA2dSXk1brLtaDEdH3TonhKELSe2iBKUJ8MavJDkW4eXLnLNQXMaOJALsm/Vb3WHF5Co47eN8jsmlGKlYfevFbkacB9SdjRp+VH+GpGyQSIaNyXiEGW+PigV1bBQ/rBLuMdFfXGtMFkjTMouBqLPGc7eN6t1DT7W0Izhxte3g5eDPYMeT2MGwkFoklggNFt0XBpHwwOmTz/gPGthe4t/P9D/WL8tH8cM1AsmZyX3YIYtntC4ZQm7geNV45R8fgThRXrw5vxuaswHjfamniOfgTD9nIZzoV+K9ksbv3ooK2nMBYCxOLFX8s02Mo6afw95wGVx2Jb8tGlfnZ5AN+4xbgHZ3oedlp7aDOUZGg6FayVqsY=
+  on: 
+    all_branches: true
+    tags: true
+  user: bars_edu
+  distributions: sdist
+  provider: pypi
+install: true
