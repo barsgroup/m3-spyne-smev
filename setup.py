@@ -1,26 +1,26 @@
 # -*- coding: utf-8 -*-
-import os
 from distutils.core import setup
 
 
-def read_file(name):
-    with open(os.path.join(os.path.dirname(__file__), name)) as fd:
-        return fd.read()
+requires = []
+with open('src/REQUIREMENTS', 'r') as f:
+    requires.extend(f.readlines())
 
 setup(
     name="spyne-smev",
     version="0.1.6",
+    url="http://bitbucket.org/bars-group/spyne-smev",
+    license='MIT',
+    author='BARS Group',
+    description=u'Набор протоколов фреймворка spyne для работы со СМЭВ',
+    author_email='bars@bars-open.ru',
+    package_dir={"": "src"},
     packages=[
         "spyne_smev", "spyne_smev.smev256", "spyne_smev.smev255",
         "spyne_smev.server", "spyne_smev.wsse"],
-    package_dir={"": "src"},
     package_data={"": ["xsd/*"]},
-    url="http://bitbucket.org/bars-group/spyne-smev",
-    license=read_file("LICENSE"),
-    description=read_file("DESCRIPTION"),
-    author="Timur Salyakhutdinov",
-    author_email="t.salyakhutdinov@gmail.com",
-    install_requires=read_file("REQUIREMENTS"),
+    install_requires=requires,
+    include_package_data=True,
     classifiers=[
         'Intended Audience :: Developers',
         'Environment :: Web Environment',
