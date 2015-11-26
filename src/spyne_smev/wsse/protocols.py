@@ -126,7 +126,7 @@ class Soap11WSSE(_Soap11):
             cleanup_namespaces, encoding, pretty_print)
 
     def create_in_document(self, ctx, charset=None):
-        if self.log_messages:
+        if logger.level == _logging.DEBUG:
             line_header = '%sRequest%s' % (
                 _color.LIGHT_GREEN, _color.END_COLOR)
             in_string = list(ctx.in_string)
