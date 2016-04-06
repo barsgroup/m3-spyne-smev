@@ -124,7 +124,8 @@ class Smev256(BaseSmev):
             ctx.udc.out_smev_message.Service.Mnemonic
             or self.smev_params.get("Mnemonic", "")
             or (ctx.udc.in_smev_message.Service
-                and ctx.udc.in_smev_message.Service.Mnemonic or ""))
+                and ctx.udc.in_smev_message.Service.Mnemonic
+                or ""))
         etree.SubElement(service, SMEV("Version")).text = (
             ctx.udc.out_smev_message.Service.Version
             or self.smev_params.get("Version", "")
