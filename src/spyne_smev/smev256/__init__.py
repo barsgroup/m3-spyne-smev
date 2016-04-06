@@ -122,14 +122,15 @@ class Smev256(BaseSmev):
         service = etree.SubElement(root, SMEV("Service"))
         etree.SubElement(service, SMEV("Mnemonic")).text = (
             ctx.udc.out_smev_message.Service.Mnemonic
+            or self.smev_params.get("Mnemonic", "")
             or (ctx.udc.in_smev_message.Service
-                and ctx.udc.in_smev_message.Service.Mnemonic)
-            or self.smev_params.get("Mnemonic", ""))
+                and ctx.udc.in_smev_message.Service.Mnemonic or ""))
         etree.SubElement(service, SMEV("Version")).text = (
             ctx.udc.out_smev_message.Service.Version
+            or self.smev_params.get("Version", "")
             or (ctx.udc.in_smev_message.Service
                 and ctx.udc.in_smev_message.Service.Version)
-            or self.smev_params.get("Version", "1.00"))
+            or "1.00")
         etree.SubElement(root, SMEV(
             "TypeCode")).text = ctx.udc.out_smev_message.TypeCode or "GSRV"
         if ctx.out_error and isinstance(ctx.out_error, _ApiError):
