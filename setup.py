@@ -8,7 +8,7 @@ with open('REQUIREMENTS', 'r') as f:
 
 setup(
     name="m3-spyne-smev",
-    version="0.1.8",
+    version="0.1.9",
     url="http://bitbucket.org/bars-group/spyne-smev",
     license='MIT',
     author='BARS Group',
