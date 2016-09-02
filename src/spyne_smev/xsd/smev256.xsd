@@ -245,7 +245,7 @@
             <xs:element ref="smev:Recipient"/>
             <xs:element ref="smev:Originator" minOccurs="0"/>
             <xs:choice>
-                <xs:element ref="smev:ServiceName"/>
+                <xs:element ref="smev:ServiceName" minOccurs="0"/>
                 <xs:element ref="smev:Service"/>
             </xs:choice>
             <xs:element ref="smev:TypeCode"/>
