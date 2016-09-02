@@ -57,7 +57,7 @@ class MessageType(SmevModel):
     Originator = OrgExternalType.customize(
         type_name="Originator", min_occurs=0, max_occurs=1)
     ServiceName = Unicode(
-        type_name="ServiceName", max_occurs=1)
+        type_name="ServiceName", min_occurs=0, max_occurs=1)
     Service = ServiceType.customize(
         type_name="Service", max_occurs=1)
     TypeCode = Unicode(
