@@ -111,7 +111,7 @@ class BaseSmev(Soap11WSSE):
             ).text = value.errorCode
             _etree.SubElement(
                 error, "{{{0}}}{1}".format(tns, "errorMessage")
-            ).text = value.errorMessage
+            ).text = value.errorMessage.decode('UTF-8')
         else:
             super(BaseSmev, self).to_parent_element(
                 cls, value, tns, parent_elt, *args, **kwargs)
@@ -127,7 +127,7 @@ class BaseSmev(Soap11WSSE):
             ).text = inst.errorCode
             _etree.SubElement(
                 error, "{{{0}}}{1}".format(ns, "errorMessage")
-            ).text = inst.errorMessage
+            ).text = inst.errorMessage.decode('UTF-8')
         else:
             return super(BaseSmev, self).to_parent(
                 ctx, cls, inst, parent, ns, *args, **kwargs)
