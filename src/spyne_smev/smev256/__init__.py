@@ -160,15 +160,20 @@ class Smev256(BaseSmev):
                 root, SMEV("OriginRequestIdRef")).text = origin_request_id_ref
 
         service_code = (
-            ctx.udc.out_smev_message.ServiceCode
-            or self.smev_params.get("ServiceCode"))
+            ctx.udc.out_smev_message.ServiceCode or
+            self.smev_params.get("ServiceCode") or
+            ctx.udc.in_smev_message.ServiceCode)
         if service_code:
             etree.SubElement(root, SMEV("ServiceCode")).text = service_code
 
-        if ctx.udc.out_smev_message.CaseNumber:
+        case_number = (
+            ctx.udc.out_smev_message.CaseNumber or
+            ctx.udc.in_smev_message.CaseNumber)
+        if case_number:
             etree.SubElement(
                 root, SMEV("CaseNumber")
-            ).text = ctx.udc.out_smev_message.CaseNumber or ""
+            ).text = case_number or ""
+
         if "OKTMO" in self.smev_params:
             etree.SubElement(
                 root, SMEV("OKTMO")).text = self.smev_params.get("OKTMO", "")
