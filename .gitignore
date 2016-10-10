@@ -1,0 +1,26 @@
+# dev specificIDE specific files
+.idea/*
+.ropeproject/*
+.codeintel/*
+.project
+.pydevproject
+.settings
+.coverage
+
+*.log
+
+# python specific
+*.pyc
+
+# setuptools specific
+.eggs
+dist
+*.egg-info
+.tox
+
+# Sphinx
+docs/_build
+docs/api
+
+# m3-builder
+version.conf
