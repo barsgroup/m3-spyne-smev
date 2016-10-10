@@ -1,21 +1,17 @@
 script: true
-notifications: 
-  hipchat: 
-    rooms: 
-    - b7098c17bc3283dc7ca388b68e3ca3@m3
-    format: html
-    template: 
-    - "%{repository}#%{build_number} (%{branch} - %{commit} : %{author}): %{message}"
-python: 
-- "2.7"
-language: python
-deploy: 
-  password: 
-    secure: E8JdAZgZ/J1UfMUEhi9fkHW88QbQ3UsA+/hhNPrOqg3kMnyQBAPNccRcc0wirdA+wBLG7M6h04tdP8OOJNg/7uuxkXGs+3J743YyiXBGz0hkesq3Zq9bdeNeDkYkrz8SEA4bgBh3u0nAjwZbOeJgCZtc5aGd1ZMgZErEwB2BJMf6aVuT43BLf3U6dMgwyWsh8iSIRUQrtu/tDrhzIjeJEiCrFlrBDrcWUkMZLAVKsYAgWyjFuL5Rsk5OpzHSiftymde14qGexrOpXesofQLKaQShMBjk2vwJgaOqIeY0Nmd2l8PIWvn1unEmO5s+zKA2dSXk1brLtaDEdH3TonhKELSe2iBKUJ8MavJDkW4eXLnLNQXMaOJALsm/Vb3WHF5Co47eN8jsmlGKlYfevFbkacB9SdjRp+VH+GpGyQSIaNyXiEGW+PigV1bBQ/rBLuMdFfXGtMFkjTMouBqLPGc7eN6t1DT7W0Izhxte3g5eDPYMeT2MGwkFoklggNFt0XBpHwwOmTz/gPGthe4t/P9D/WL8tH8cM1AsmZyX3YIYtntC4ZQm7geNV45R8fgThRXrw5vxuaswHjfamniOfgTD9nIZzoV+K9ksbv3ooK2nMBYCxOLFX8s02Mo6afw95wGVx2Jb8tGlfnZ5AN+4xbgHZ3oedlp7aDOUZGg6FayVqsY=
-  on: 
-    all_branches: true
-    tags: true
-  user: bars_edu
-  distributions: sdist
-  provider: pypi
 install: true
+language: python
+python:
+- '2.7'
+deploy:
+  provider: pypi
+  user: bars-travis
+  password:
+    secure: YclWf5L07fPtnHK1vlHEoDkWXWTgaHIPXndAnz6Spn+DWj1pX0P8R9uv7Ks2HVv8R7FPVO6t+b8hGUfAbXpRWbe8/yuBp15lKwzH2khJjAsF0DkbUhHSr1YK1Fv6zqHo6M4gXUKCDg+Hy/sl6mtTuOM5ip50AEy3tHdoISrAN/xh0NokYKYAmsFHuO1NeCZFcj9cXObHR4ESGJG55uvq65Xj5G088VZk1WZbwuefC54zAQg4R5ptgh/R/gvupU+9mORiZq2s+6LqViwiOtFg9oBkA18G/YV+JPEF4yEazkmXowQ/18PI7Y9npwidTttC59y6ecEWUe6ozy3wRSL4NlCuKYc99vxnot8XjREtqqcKWF3cwZBOR35QZrGfk+C/zBzBlJ7fcpThiY2PwY+hZBLMX0gajoIxKK7GRLcB5PPNj6jeWewPP4YFV3kxXhrXu2j9GHSzL7lRF/H5mu8lq5EDcKW2+YnNsiCay+kFXkabBeWReNHSmITdkOZquRBmCFqOW/5B4sN4bRYGMKNE1RJKnC5xFTfBLG5eVZ+Uyy7tbCH/plw87fl7tOSuRTrE4FmXk76e8dbpT+uUMTpwgYj5VJ5xKAcMZYLUZAusfhDwOHQHVN2fvuXrmiX8hDgAwUKf3alukfqFQxuN0NUdFu6+aaziEQTZHYk+OBdgT9A=
+  on:
+    tags: true
+  distributions: sdist
+notifications:
+  email:
+    recipients:
+    - dev-py@bars-open.ru
