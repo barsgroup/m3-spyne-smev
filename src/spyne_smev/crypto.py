@@ -156,8 +156,6 @@ def verify(data, cert_data, signature, digest_name="sha1"):
     if pkey == _ffi.NULL:
         _raise_current_error()
 
-    pkey = _ffi.gc(pkey, _lib.EVP_PKEY_free)
-
     result = _lib.EVP_VerifyFinal(
         md_ctx, signature, len(signature), pkey)
 
