@@ -48,5 +48,8 @@ class ApiError(_Fault):
         return self.errorMessage
 
     def __repr__(self):
-        return u"Error({0}: {1})".format(self.errorCode, self.errorMessage)
-
+        try:
+            return u"Error({0}: {1})".format(self.errorCode, self.errorMessage)
+        except UnicodeDecodeError:
+            return u"Error({0}: {1})".format(
+                self.errorCode, self.errorMessage.decode('UTF-8'))
