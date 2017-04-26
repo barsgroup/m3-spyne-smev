@@ -14,7 +14,7 @@ from .._utils import EmptyCtx, el_name_with_ns
 from .. fault import ApiError as _ApiError
 from .. import _xmlns as ns
 
-from model import MessageType, ServiceType, HeaderType, AppDocument
+from .model import MessageType, ServiceType, HeaderType, AppDocument
 
 try:
     from spyne.protocol.xml.model import complex_from_element as _spyne_cfe

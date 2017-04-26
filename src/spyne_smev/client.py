@@ -122,7 +122,7 @@ class _WsseSecurity(_MessagePlugin):
                 out_document = _utils.sign_document(
                     document, self.certificate, self.private_key,
                     self.private_key_password, self.digest_method)
-            except Exception, e:
+            except Exception as e:
                 logger.error("Cannot sign document")
                 logger.exception(e)
                 raise
@@ -140,7 +140,7 @@ class _WsseSecurity(_MessagePlugin):
             try:
                 _utils.verify_document(document, self.in_certificate)
                 self._verified = True
-            except Exception, e:
+            except Exception as e:
                 logger.exception(e)
                 raise
             finally:

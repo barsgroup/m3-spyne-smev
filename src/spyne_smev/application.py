@@ -9,6 +9,8 @@ application.py
 import logging
 logger = logging.getLogger(__name__)
 
+from six import binary_type
+
 from traceback import format_exc
 
 from spyne.model.fault import Fault
@@ -27,13 +29,13 @@ class Application(SpyneApplication):
     def call_wrapper(self, ctx):
         try:
             return super(Application, self).call_wrapper(ctx)
-        except Fault, e:
+        except Fault as e:
             logger.exception(e)
             raise
-        except Exception, e:
-            e_text = unicode(format_exc(), errors="ignore")
+        except Exception as e:
+            e_text = format_exc()
+            if isinstance(e_text, binary_type):
+                e_text = e_text.decode("utf-8", errors="ignore")
             self.event_manager.fire_event("method_call_exception", e_text)
             logger.exception(e)
             raise InternalError(e)
-
-

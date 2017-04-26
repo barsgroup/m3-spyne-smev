@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-"""               
+"""
 utils.py
-                  
-:Created: 03 Jul 2014  
-:Author: tim    
+
+:Created: 03 Jul 2014
+:Author: tim
 """
 
 from copy import deepcopy as _deepcopy
@@ -28,7 +28,7 @@ _c14n_nsmap = {
     (False, True): _xmlns.xml_c14n_wc,
 }
 
-_c14n_params = dict((v, k) for k, v in _c14n_nsmap.iteritems())
+_c14n_params = dict((v, k) for k, v in _c14n_nsmap.items())
 
 _digest_method_nsmap = {
     "md_gost94": _xmlns.gost94,
@@ -279,7 +279,7 @@ def verify_document(document, certificate):
     if not inc_ns is None:
         inc_ns_prefixes = inc_ns.attrib["PrefixList"].split()
         inc_ns_map = dict(
-            (k, v) for k, v in document.nsmap.iteritems()
+            (k, v) for k, v in document.nsmap.items()
             if k in inc_ns_prefixes)
     else:
         inc_ns_map = None
@@ -318,7 +318,7 @@ def verify_document(document, certificate):
     if not inc_ns is None:
         inc_ns_prefixes = inc_ns.attrib["PrefixList"].split()
         inc_ns_map = dict(
-            (k, v) for k, v in document.nsmap.iteritems()
+            (k, v) for k, v in document.nsmap.items()
             if k in inc_ns_prefixes)
     else:
         inc_ns_map = None

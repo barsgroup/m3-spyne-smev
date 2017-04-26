@@ -18,3 +18,6 @@ class DjangoApplication(_SpyneDjangoApplication):
         super(DjangoApplication, self).__init__(
             app, chunked, max_content_length, block_length)
         self.doc = _AllYourInterfaceDocuments(app.interface)
+
+    def set_response(self, retval, response):
+        retval.content = b''.join(response)

@@ -7,10 +7,9 @@ factory.py
 :Author: timic
 """
 import os
-from StringIO import StringIO
 
 from lxml import etree
-from six import binary_type, text_type, PY3
+from six import StringIO, binary_type, text_type, PY3
 from spyne.model.complex import ComplexModelMeta, ComplexModelBase
 
 el_name_with_ns = lambda ns: lambda el: '{%s}%s' % (ns, el)
@@ -22,6 +21,9 @@ class EmptyCtx(object):
         return self.__dict__.get(name, EmptyCtx())
 
     def __nonzero__(self):
+        return False
+
+    def __bool__(self):
         return False
 
 

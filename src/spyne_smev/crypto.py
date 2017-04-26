@@ -14,7 +14,7 @@ from functools import partial as _partial
 
 from cryptography.hazmat.bindings.openssl.binding import Binding as _Binding
 
-import _utils
+from . import _utils
 
 _binding = _Binding()
 _lib, _ffi = _binding.lib, _binding.ffi

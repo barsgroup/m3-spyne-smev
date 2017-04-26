@@ -10,6 +10,8 @@ import logging as _logging
 logger = _logging.getLogger(__name__)
 #TODO: add log messages
 
+from six import text_type
+
 from copy import deepcopy as _deepcopy
 
 from spyne.const import ansi_color as _color
@@ -79,7 +81,7 @@ class X509TokenProfile(BaseWSS):
             return sign_document(
                 envelope, self.certificate, self.private_key,
                 self._private_key_pass, self.digest_method)
-        except ValueError, e:
+        except ValueError as e:
             logger.error(
                 "Error occurred while signing document:\n{0}\n"
                 "Keep it unsigned ...".format(e.message))
@@ -95,12 +97,12 @@ class X509TokenProfile(BaseWSS):
         logger.info("Validate signed document")
         try:
             verify_document(envelope, self.certificate)
-        except (_crypto.Error, ValueError), e:
+        except (_crypto.Error, ValueError) as e:
             logger.error("Signature check failed! Error:\n{0}".format(
-                unicode(e)))
+                text_type(e)))
             raise _Fault(
                 faultstring="Signature check failed! Error:\n{0}".format(
-                    unicode(e)))
+                    text_type(e)))
         except _crypto.InvalidSignature:
             raise _Fault(faultstring="Invalid signature!")
 
