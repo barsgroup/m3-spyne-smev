@@ -13,6 +13,7 @@ from functools import partial as _partial
 import uuid as _uuid
 
 from lxml import etree as _etree
+import six
 
 from spyne_smev import crypto as _crypto
 from spyne_smev import _utils
@@ -28,7 +29,7 @@ _c14n_nsmap = {
     (False, True): _xmlns.xml_c14n_wc,
 }
 
-_c14n_params = dict((v, k) for k, v in _c14n_nsmap.items())
+_c14n_params = dict((v, k) for k, v in six.iteritems(_c14n_nsmap))
 
 _digest_method_nsmap = {
     "md_gost94": _xmlns.gost94,
@@ -279,7 +280,7 @@ def verify_document(document, certificate):
     if not inc_ns is None:
         inc_ns_prefixes = inc_ns.attrib["PrefixList"].split()
         inc_ns_map = dict(
-            (k, v) for k, v in document.nsmap.items()
+            (k, v) for k, v in six.iteritems(document.nsmap)
             if k in inc_ns_prefixes)
     else:
         inc_ns_map = None
@@ -318,7 +319,7 @@ def verify_document(document, certificate):
     if not inc_ns is None:
         inc_ns_prefixes = inc_ns.attrib["PrefixList"].split()
         inc_ns_map = dict(
-            (k, v) for k, v in document.nsmap.items()
+            (k, v) for k, v in six.iteritems(document.nsmap)
             if k in inc_ns_prefixes)
     else:
         inc_ns_map = None
