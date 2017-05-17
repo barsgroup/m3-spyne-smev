@@ -22,7 +22,6 @@ def _read(fname):
 
 setup(
     name='m3-spyne-smev',
-    description=u'Набор протоколов фреймворка spyne для работы со СМЭВ',
     url='http://bitbucket.org/bars-group/spyne-smev',
     license='MIT',
     author='BARS Group',
