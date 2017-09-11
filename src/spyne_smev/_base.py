@@ -12,6 +12,7 @@ logger = _logging.getLogger(__name__)
 import os
 
 from lxml import etree as _etree
+from six import text_type
 
 from spyne.interface.wsdl.wsdl11 import Wsdl11 as _Wsdl11
 from spyne.model.fault import Fault as _Fault
@@ -110,7 +111,7 @@ class BaseSmev(Soap11WSSE):
                 error, "{{{0}}}{1}".format(tns, "errorCode")
             ).text = value.errorCode
 
-            if not isinstance(value.errorMessage, unicode):
+            if not isinstance(value.errorMessage, text_type):
                 error_msg = value.errorMessage.decode('UTF-8')
             else:
                 error_msg = value.errorMessage
@@ -132,7 +133,7 @@ class BaseSmev(Soap11WSSE):
                 error, "{{{0}}}{1}".format(ns, "errorCode")
             ).text = inst.errorCode
 
-            if not isinstance(inst.errorMessage, unicode):
+            if not isinstance(inst.errorMessage, text_type):
                 error_msg = inst.errorMessage.decode('UTF-8')
             else:
                 error_msg = inst.errorMessage
