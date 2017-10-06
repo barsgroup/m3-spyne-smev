@@ -143,9 +143,12 @@ class Smev256(BaseSmev):
             "Status")).text = ctx.udc.out_smev_message.Status or status
         etree.SubElement(
             root, SMEV("Date")).text = datetime.datetime.utcnow().isoformat()
-        etree.SubElement(
-            root, SMEV("ExchangeType")).text = self.smev_params.get(
-                "ExchangeType", "0")
+
+        exchange_type = (
+            self.smev_params.get("ExchangeType") or
+            unicode(ctx.udc.in_smev_message.ExchangeType) or
+            "0")
+        etree.SubElement(root, SMEV("ExchangeType")).text = exchange_type
 
         request_id_ref = (
             ctx.udc.out_smev_message.RequestIdRef
