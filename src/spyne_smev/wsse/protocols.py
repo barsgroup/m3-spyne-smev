@@ -123,7 +123,8 @@ class Soap11WSSE(_Soap11):
             pretty_print = False
         super(Soap11WSSE, self).__init__(
             app=app, validator=validator, xml_declaration=xml_declaration,
-            cleanup_namespaces=cleanup_namestaces, encoding=endoding, pretty_print=pretty_print)
+            cleanup_namespaces=cleanup_namespaces, encoding=encoding,
+            pretty_print=pretty_print)
 
     def create_in_document(self, ctx, charset=None):
         if logger.level == _logging.DEBUG:
