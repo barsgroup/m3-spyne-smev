@@ -1,11 +1,6 @@
-# -*- coding: utf-
+# coding: utf-8
+from __future__ import absolute_import
 
-"""
-django.py
-
-:Created: 12 Jun 2014
-:Author: tim
-"""
 from spyne.server.django import DjangoApplication as _SpyneDjangoApplication
 
 from spyne_smev.server import _AllYourInterfaceDocuments

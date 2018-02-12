@@ -1,22 +1,17 @@
-# -*- coding: utf-8 -*-
-
-"""               
-utils.py
-                  
-:Created: 03 Jul 2014  
-:Author: tim    
-"""
+# coding: utf-8
+from __future__ import absolute_import
 
 from copy import deepcopy as _deepcopy
-import base64 as _base64
 from functools import partial as _partial
+import base64 as _base64
 import uuid as _uuid
 
 from lxml import etree as _etree
 
-from spyne_smev import crypto as _crypto
 from spyne_smev import _utils
 from spyne_smev import _xmlns
+from spyne_smev import crypto as _crypto
+
 
 _nsmap = _xmlns.nsmap
 

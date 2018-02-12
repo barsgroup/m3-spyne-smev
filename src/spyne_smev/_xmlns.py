@@ -1,11 +1,6 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
+from __future__ import absolute_import
 
-"""
-_xmlns.py
-
-:Created: 3/13/14
-:Author: timic
-"""
 
 smev245 = "http://smev.gosuslugi.ru/rev111111"
 smev256 = "http://smev.gosuslugi.ru/rev120315"

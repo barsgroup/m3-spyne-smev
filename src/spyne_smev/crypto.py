@@ -1,20 +1,19 @@
-# -*- coding: utf-8 -*-
-
-"""
-crypto.py
-
-:Created: 6/9/14
-:Author: timic
-"""
-import logging as _logging
-logger = _logging.getLogger(__name__)
-# TODO: add log messages
+# coding: utf-8
+from __future__ import absolute_import
 
 from functools import partial as _partial
+import logging as _logging
 
 from cryptography.hazmat.bindings.openssl.binding import Binding as _Binding
 
-import _utils
+from . import _utils
+
+
+logger = _logging.getLogger(__name__)
+# TODO: add log messages
+
+
+
 
 _binding = _Binding()
 _lib, _ffi = _binding.lib, _binding.ffi

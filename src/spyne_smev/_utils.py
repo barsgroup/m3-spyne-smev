@@ -1,17 +1,17 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
+from __future__ import absolute_import
 
-"""
-factory.py
-
-:Created: 3/13/14
-:Author: timic
-"""
-import os
 from StringIO import StringIO
+import os
+
+from six import PY3
+from six import binary_type
+from six import text_type
 
 from lxml import etree
-from six import binary_type, text_type, PY3
-from spyne.model.complex import ComplexModelMeta, ComplexModelBase
+from spyne.model.complex import ComplexModelBase
+from spyne.model.complex import ComplexModelMeta
+
 
 el_name_with_ns = lambda ns: lambda el: '{%s}%s' % (ns, el)
 

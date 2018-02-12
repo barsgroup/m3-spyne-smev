@@ -1,8 +1,2 @@
-# -*- coding: utf-8 -*-
-
-"""
-__init__.py.py
-
-:Created: 3/12/14
-:Author: timic
-"""
+# coding: utf-8
+from __future__ import absolute_import

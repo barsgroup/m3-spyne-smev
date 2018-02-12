@@ -1,13 +1,7 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
+from __future__ import absolute_import
 
-"""
-client.py
-
-:Created: 5/29/14
-:Author: timic
-"""
 import logging as _logging
-logger = _logging.getLogger(__name__)
 
 from lxml import etree as _etree
 from suds.client import Client as _SudsClient
@@ -16,6 +10,11 @@ from suds.sax.parser import Parser as _Parser
 
 from spyne_smev import crypto as _crypto
 from spyne_smev.wsse import utils as _utils
+
+
+logger = _logging.getLogger(__name__)
+
+
 
 
 class Client(_SudsClient):

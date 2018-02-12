@@ -1,20 +1,22 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
+from __future__ import absolute_import
 
-"""
-:Created: 3/12/14
-:Author: timic
-"""
 import datetime
 import os
 
 from lxml import etree
+from model import AppDocument
+from model import HeaderType
+from model import MessageType
+from model import ServiceType
 
-from .._base import BaseSmev, BaseSmevWsdl
-from .._utils import EmptyCtx, el_name_with_ns
-from .. fault import ApiError as _ApiError
 from .. import _xmlns as ns
+from .._base import BaseSmev
+from .._base import BaseSmevWsdl
+from .._utils import EmptyCtx
+from .._utils import el_name_with_ns
+from ..fault import ApiError as _ApiError
 
-from model import MessageType, ServiceType, HeaderType, AppDocument
 
 try:
     from spyne.protocol.xml.model import complex_from_element as _spyne_cfe

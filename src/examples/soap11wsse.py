@@ -1,25 +1,26 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
+from __future__ import absolute_import
 
-"""               
-soap11wsse.py
-                  
-:Created: 24 Jun 2014  
-:Author: tim    
-"""
+from wsgiref.simple_server import make_server
 import logging
+
+from spyne.application import Application
+from spyne.decorator import rpc
+from spyne.model.complex import Iterable
+from spyne.model.primitive import Integer
+from spyne.model.primitive import Unicode
+from spyne.server.wsgi import WsgiApplication
+from spyne.service import ServiceBase
+
+from spyne_smev.wsse.protocols import Soap11WSSE
+from spyne_smev.wsse.protocols import X509TokenProfile
+
+
 logging.basicConfig(level=logging.DEBUG)
 logging.getLogger("spyne.protocol.xml").setLevel(logging.DEBUG)
 
-from wsgiref.simple_server import make_server
 
-from spyne.application import Application
-from spyne.service import ServiceBase
-from spyne.decorator import rpc
-from spyne.server.wsgi import WsgiApplication
-from spyne.model.primitive import Integer, Unicode
-from spyne.model.complex import Iterable
 
-from spyne_smev.wsse.protocols import Soap11WSSE, X509TokenProfile
 
 
 TEST_PRIVATE_KEY = """\

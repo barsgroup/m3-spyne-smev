@@ -1,11 +1,5 @@
-# -*- coding: utf-
-
-"""
-test_crypto.py
-
-:Created: 10 Jun 2014
-:Author: tim
-"""
+# coding: utf-8
+from __future__ import absolute_import
 
 import unittest
 
@@ -103,4 +97,3 @@ class TestCase(unittest.TestCase):
 
     def test_verify_signature(self):
         self.assertEqual(True, False)
-

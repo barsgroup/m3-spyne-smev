@@ -1,23 +1,24 @@
-# -*- coding: utf-8 -*-
-
-"""
-protocols.py
-
-:Created: 6/10/14
-:Author: timic
-"""
-import logging as _logging
-logger = _logging.getLogger(__name__)
-#TODO: add log messages
+# coding: utf-8
+from __future__ import absolute_import
 
 from copy import deepcopy as _deepcopy
+import logging as _logging
 
 from spyne.const import ansi_color as _color
 from spyne.model.fault import Fault as _Fault
 from spyne.protocol.soap import Soap11 as _Soap11
 
 from spyne_smev import crypto as _crypto
-from spyne_smev.wsse.utils import _c14n_nsmap, verify_document, sign_document
+from spyne_smev.wsse.utils import _c14n_nsmap
+from spyne_smev.wsse.utils import sign_document
+from spyne_smev.wsse.utils import verify_document
+
+
+logger = _logging.getLogger(__name__)
+#TODO: add log messages
+
+
+
 
 
 class BaseWSS(object):

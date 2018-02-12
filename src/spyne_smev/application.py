@@ -1,19 +1,17 @@
-# -*- coding: utf-8 -*-
-
-"""
-application.py
-
-:Created: 4/3/14
-:Author: timic
-"""
-import logging
-logger = logging.getLogger(__name__)
+# coding: utf-8
+from __future__ import absolute_import
 
 from traceback import format_exc
+import logging
 
-from spyne.model.fault import Fault
 from spyne.application import Application as SpyneApplication
 from spyne.error import InternalError
+from spyne.model.fault import Fault
+
+
+logger = logging.getLogger(__name__)
+
+
 
 
 class Application(SpyneApplication):
@@ -35,5 +33,3 @@ class Application(SpyneApplication):
             self.event_manager.fire_event("method_call_exception", e_text)
             logger.exception(e)
             raise InternalError(e)
-
-

@@ -1,26 +1,25 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
+from __future__ import absolute_import
 
-"""
-_base.py
-
-:Created: 5/13/14
-:Author: timic
-"""
 import logging as _logging
-logger = _logging.getLogger(__name__)
-
 import os
 
 from lxml import etree as _etree
-
+from spyne.const.http import HTTP_200
 from spyne.interface.wsdl.wsdl11 import Wsdl11 as _Wsdl11
 from spyne.model.fault import Fault as _Fault
-from spyne.const.http import HTTP_200
-
-import _utils
-import _xmlns as _ns
 from wsse.protocols import Soap11WSSE
-from fault import ApiError as _ApiError
+
+from . import _utils
+from . import _xmlns as _ns
+from .fault import ApiError as _ApiError
+
+
+logger = _logging.getLogger(__name__)
+
+
+
+
 
 
 class BaseSmev(Soap11WSSE):
