@@ -18,10 +18,6 @@ from .fault import ApiError as _ApiError
 logger = _logging.getLogger(__name__)
 
 
-
-
-
-
 class BaseSmev(Soap11WSSE):
     """
     Базовый класс для протоколов СМЭВ
@@ -104,7 +100,9 @@ class BaseSmev(Soap11WSSE):
         if issubclass(cls, _ApiError):
             message = _etree.SubElement(
                 parent_elt, "{{{0}}}{1}".format(tns, value.messageName))
-            error = _etree.SubElement(message, "{{{0}}}{1}".format(tns, "Error"))
+            error = _etree.SubElement(
+                message, "{{{0}}}{1}".format(tns, "Error")
+            )
             _etree.SubElement(
                 error, "{{{0}}}{1}".format(tns, "errorCode")
             ).text = value.errorCode
@@ -126,7 +124,9 @@ class BaseSmev(Soap11WSSE):
         if issubclass(cls, _ApiError):
             message = _etree.SubElement(
                 parent, "{{{0}}}{1}".format(ns, inst.messageName))
-            error = _etree.SubElement(message, "{{{0}}}{1}".format(ns, "Error"))
+            error = _etree.SubElement(
+                message, "{{{0}}}{1}".format(ns, "Error")
+            )
             _etree.SubElement(
                 error, "{{{0}}}{1}".format(ns, "errorCode")
             ).text = inst.errorCode

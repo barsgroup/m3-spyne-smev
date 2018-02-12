@@ -12,8 +12,6 @@ from spyne.model.fault import Fault
 logger = logging.getLogger(__name__)
 
 
-
-
 class Application(SpyneApplication):
     """
     Замена Application из spyne. Позволяет дополнительно обрабатывать эксепшны

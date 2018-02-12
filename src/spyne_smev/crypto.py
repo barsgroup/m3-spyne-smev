@@ -13,8 +13,6 @@ logger = _logging.getLogger(__name__)
 # TODO: add log messages
 
 
-
-
 _binding = _Binding()
 _lib, _ffi = _binding.lib, _binding.ffi
 _openssl_configured = False
@@ -50,6 +48,7 @@ def _exception_from_error_queue(exception_type):
             text(_lib.ERR_reason_error_string(error))))
 
     raise exception_type(errors)
+
 
 _raise_current_error = _partial(_exception_from_error_queue, Error)
 

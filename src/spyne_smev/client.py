@@ -15,8 +15,6 @@ from spyne_smev.wsse import utils as _utils
 logger = _logging.getLogger(__name__)
 
 
-
-
 class Client(_SudsClient):
     """
     Suds client which supports digital signing with XMLDSIG messages via
@@ -47,7 +45,7 @@ class Client(_SudsClient):
             digest_method="sha1",
             security_direction=BOTH, **kwargs):
 
-        if not security_direction in (self.IN, self.OUT, self.BOTH):
+        if security_direction not in (self.IN, self.OUT, self.BOTH):
             raise ValueError(
                 "direction should be constant either IN, OUT or BOTH!")
 

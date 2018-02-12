@@ -13,7 +13,10 @@ from spyne.model.complex import ComplexModelBase
 from spyne.model.complex import ComplexModelMeta
 
 
-el_name_with_ns = lambda ns: lambda el: '{%s}%s' % (ns, el)
+def el_name_with_ns(ns):
+    def inner(el):
+        return '{%s}%s' % (ns, el)
+    return inner
 
 
 class EmptyCtx(object):
@@ -91,6 +94,7 @@ def native(s):
             return s.encode("utf-8")
     return s
 
+
 if PY3:
     def byte_string(s):
         return s.encode("charmap")
@@ -99,5 +103,9 @@ else:
         return s
 
 
-isnone = lambda obj: obj is None
-notisnone = lambda obj: not obj is None
+def isnone(obj):
+    return obj is None
+
+
+def notisnone(obj):
+    return obj is not None

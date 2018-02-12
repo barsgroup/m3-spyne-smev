@@ -15,10 +15,7 @@ from spyne_smev.wsse.utils import verify_document
 
 
 logger = _logging.getLogger(__name__)
-#TODO: add log messages
-
-
-
+# TODO: add log messages
 
 
 class BaseWSS(object):

@@ -271,7 +271,7 @@ def verify_document(document, certificate):
     exc_c14n, with_comments = _c14n_params.get(c14n_method)
     inc_ns = transform.find("{{{0}}}InclusiveNamespaces".format(
         _xmlns.exc_c14n))
-    if not inc_ns is None:
+    if inc_ns is not None:
         inc_ns_prefixes = inc_ns.attrib["PrefixList"].split()
         inc_ns_map = dict(
             (k, v) for k, v in document.nsmap.iteritems()
@@ -310,7 +310,7 @@ def verify_document(document, certificate):
     exc_c14n, with_comments = _c14n_params.get(c14n_method)
     inc_ns = c14n_method_node.find("{{{0}}}InclusiveNamespaces".format(
         _xmlns.exc_c14n))
-    if not inc_ns is None:
+    if inc_ns is not None:
         inc_ns_prefixes = inc_ns.attrib["PrefixList"].split()
         inc_ns_map = dict(
             (k, v) for k, v in document.nsmap.iteritems()
