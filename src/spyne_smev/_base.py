@@ -5,9 +5,13 @@ import logging as _logging
 import os
 
 from lxml import etree as _etree
+from six.moves import filter
+from six.moves import map
 from spyne.const.http import HTTP_200
 from spyne.interface.wsdl.wsdl11 import Wsdl11 as _Wsdl11
 from spyne.model.fault import Fault as _Fault
+import six
+
 from wsse.protocols import Soap11WSSE
 
 from . import _utils
@@ -61,10 +65,12 @@ class BaseSmev(Soap11WSSE):
                    (ctx.udc.in_smev_message_document, message_data))):
             raise _Fault("SMEV-100010", "Invalid configuration!")
 
-        map(self._validate_smev_element, filter(_utils.notisnone, (
-            ctx.udc.in_smev_message_document,
-            ctx.udc.in_smev_header_document,
-            message_data)))
+        for element in (ctx.udc.in_smev_message_document,
+                        ctx.udc.in_smev_header_document,
+                        message_data):
+            if element is not None:
+                self._validate_smev_element(element)
+
         method_data = message_data.find(
             ".//{{{smev}}}AppData".format(**self._ns)).getchildren()
         method = in_document.find(
@@ -107,7 +113,7 @@ class BaseSmev(Soap11WSSE):
                 error, "{{{0}}}{1}".format(tns, "errorCode")
             ).text = value.errorCode
 
-            if not isinstance(value.errorMessage, unicode):
+            if not isinstance(value.errorMessage, six.text_type):
                 error_msg = value.errorMessage.decode('UTF-8')
             else:
                 error_msg = value.errorMessage
@@ -131,7 +137,7 @@ class BaseSmev(Soap11WSSE):
                 error, "{{{0}}}{1}".format(ns, "errorCode")
             ).text = inst.errorCode
 
-            if not isinstance(inst.errorMessage, unicode):
+            if not isinstance(inst.errorMessage, six.text_type):
                 error_msg = inst.errorMessage.decode('UTF-8')
             else:
                 error_msg = inst.errorMessage

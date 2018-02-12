@@ -1,14 +1,13 @@
 # coding: utf-8
 from __future__ import absolute_import
 
-from StringIO import StringIO
 import os
 
+from lxml import etree
 from six import PY3
 from six import binary_type
 from six import text_type
-
-from lxml import etree
+from six.moves import cStringIO as StringIO
 from spyne.model.complex import ComplexModelBase
 from spyne.model.complex import ComplexModelMeta
 
@@ -24,8 +23,9 @@ class EmptyCtx(object):
     def __getattr__(self, name):
         return self.__dict__.get(name, EmptyCtx())
 
-    def __nonzero__(self):
+    def __bool__(self):
         return False
+    __nonzero__ = __bool__
 
 
 def copy_with_nsmap(element, nsmap):

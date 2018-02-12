@@ -7,6 +7,7 @@ import logging as _logging
 from spyne.const import ansi_color as _color
 from spyne.model.fault import Fault as _Fault
 from spyne.protocol.soap import Soap11 as _Soap11
+import six
 
 from spyne_smev import crypto as _crypto
 from spyne_smev.wsse.utils import _c14n_nsmap
@@ -77,10 +78,10 @@ class X509TokenProfile(BaseWSS):
             return sign_document(
                 envelope, self.certificate, self.private_key,
                 self._private_key_pass, self.digest_method)
-        except ValueError, e:
+        except ValueError as e:
             logger.error(
                 "Error occurred while signing document:\n{0}\n"
-                "Keep it unsigned ...".format(e.message))
+                "Keep it unsigned ...".format(six.text_type(e)))
             return unsigned
 
     def validate(self, envelope):
@@ -93,12 +94,12 @@ class X509TokenProfile(BaseWSS):
         logger.info("Validate signed document")
         try:
             verify_document(envelope, self.certificate)
-        except (_crypto.Error, ValueError), e:
+        except (_crypto.Error, ValueError) as e:
             logger.error("Signature check failed! Error:\n{0}".format(
-                unicode(e)))
+                six.text_type(e)))
             raise _Fault(
                 faultstring="Signature check failed! Error:\n{0}".format(
-                    unicode(e)))
+                    six.text_type(e)))
         except _crypto.InvalidSignature:
             raise _Fault(faultstring="Invalid signature!")
 

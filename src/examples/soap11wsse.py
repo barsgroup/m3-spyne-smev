@@ -4,6 +4,7 @@ from __future__ import absolute_import
 from wsgiref.simple_server import make_server
 import logging
 
+from six.moves import range
 from spyne.application import Application
 from spyne.decorator import rpc
 from spyne.model.complex import Iterable
@@ -18,9 +19,6 @@ from spyne_smev.wsse.protocols import X509TokenProfile
 
 logging.basicConfig(level=logging.DEBUG)
 logging.getLogger("spyne.protocol.xml").setLevel(logging.DEBUG)
-
-
-
 
 
 TEST_PRIVATE_KEY = """\
@@ -68,7 +66,7 @@ class HelloService(ServiceBase):
 
     @rpc(Unicode, Integer, _returns=Iterable(Unicode))
     def SayHello(ctx, Name, Times):
-        return (u"Hello, {0}!".format(Name) for _ in xrange(Times))
+        return (u"Hello, {0}!".format(Name) for _ in range(Times))
 
 security = X509TokenProfile(
     private_key=TEST_PRIVATE_KEY, private_key_pass="12345678",

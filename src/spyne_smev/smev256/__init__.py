@@ -5,6 +5,8 @@ import datetime
 import os
 
 from lxml import etree
+import six
+
 from model import AppDocument
 from model import HeaderType
 from model import MessageType
@@ -148,7 +150,7 @@ class Smev256(BaseSmev):
 
         exchange_type = (
             self.smev_params.get("ExchangeType") or
-            unicode(ctx.udc.in_smev_message.ExchangeType) or
+            six.text_type(ctx.udc.in_smev_message.ExchangeType) or
             "0")
         etree.SubElement(root, SMEV("ExchangeType")).text = exchange_type
 

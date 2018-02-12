@@ -3,6 +3,7 @@ from __future__ import absolute_import
 
 from wsgiref.simple_server import make_server
 
+from six.moves import range
 from spyne.decorator import rpc
 from spyne.model.complex import Iterable
 from spyne.model.primitive import Integer
@@ -79,7 +80,7 @@ class HelloService(ServiceBase):
 
     @rpc(Unicode, Integer, _returns=Iterable(Unicode))
     def SayHello(ctx, Name, Times):
-        return (u"Hello, {0}!".format(Name) for _ in xrange(Times))
+        return (u"Hello, {0}!".format(Name) for _ in range(Times))
 
 application = Application(
     [HelloService], "http://example.com/hello-world-tns", "HelloWorld",

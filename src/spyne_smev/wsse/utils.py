@@ -7,6 +7,7 @@ import base64 as _base64
 import uuid as _uuid
 
 from lxml import etree as _etree
+import six
 
 from spyne_smev import _utils
 from spyne_smev import _xmlns
@@ -23,7 +24,9 @@ _c14n_nsmap = {
     (False, True): _xmlns.xml_c14n_wc,
 }
 
-_c14n_params = dict((v, k) for k, v in _c14n_nsmap.iteritems())
+_c14n_params = dict(
+    (v, k) for k, v in six.iteritems(_c14n_nsmap)
+)
 
 _digest_method_nsmap = {
     "md_gost94": _xmlns.gost94,
@@ -33,7 +36,9 @@ _digest_method_nsmap = {
     "md5": _xmlns.md5,
 }
 
-_digest_method_names = dict((v, k) for k, v in _digest_method_nsmap.items())
+_digest_method_names = dict(
+    (v, k) for k, v in six.iteritems(_digest_method_nsmap)
+)
 
 _signature_method_nsmap = {
     "RSA-SHA1": _xmlns.rsa_sha1,
@@ -274,7 +279,7 @@ def verify_document(document, certificate):
     if inc_ns is not None:
         inc_ns_prefixes = inc_ns.attrib["PrefixList"].split()
         inc_ns_map = dict(
-            (k, v) for k, v in document.nsmap.iteritems()
+            (k, v) for k, v in six.iteritems(document.nsmap)
             if k in inc_ns_prefixes)
     else:
         inc_ns_map = None
@@ -313,7 +318,7 @@ def verify_document(document, certificate):
     if inc_ns is not None:
         inc_ns_prefixes = inc_ns.attrib["PrefixList"].split()
         inc_ns_map = dict(
-            (k, v) for k, v in document.nsmap.iteritems()
+            (k, v) for k, v in six.iteritems(document.nsmap)
             if k in inc_ns_prefixes)
     else:
         inc_ns_map = None

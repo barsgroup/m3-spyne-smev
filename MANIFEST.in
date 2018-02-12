@@ -1,5 +1,8 @@
 include REQUIREMENTS README README.md LICENSE DESCRIPTION
 include version.conf
+recursive-include requirements *
 recursive-include src *
 recursive-exclude src *.pyc
 recursive-exclude src *.orig
+prune src/examples
+prune src/tests
