@@ -1,20 +1,24 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
+from __future__ import absolute_import
 
-"""
-:Created: 3/12/14
-:Author: timic
-"""
 import datetime
 import os
 
 from lxml import etree
+import six
 
-from .._base import BaseSmev, BaseSmevWsdl
-from .._utils import EmptyCtx, el_name_with_ns
-from .. fault import ApiError as _ApiError
+from model import AppDocument
+from model import HeaderType
+from model import MessageType
+from model import ServiceType
+
 from .. import _xmlns as ns
+from .._base import BaseSmev
+from .._base import BaseSmevWsdl
+from .._utils import EmptyCtx
+from .._utils import el_name_with_ns
+from ..fault import ApiError as _ApiError
 
-from model import MessageType, ServiceType, HeaderType, AppDocument
 
 try:
     from spyne.protocol.xml.model import complex_from_element as _spyne_cfe
@@ -146,7 +150,7 @@ class Smev256(BaseSmev):
 
         exchange_type = (
             self.smev_params.get("ExchangeType") or
-            unicode(ctx.udc.in_smev_message.ExchangeType) or
+            six.text_type(ctx.udc.in_smev_message.ExchangeType) or
             "0")
         etree.SubElement(root, SMEV("ExchangeType")).text = exchange_type
 

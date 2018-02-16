@@ -1,25 +1,24 @@
-# -*- coding: utf-8 -*-
-
-"""               
-soap11wsse.py
-                  
-:Created: 24 Jun 2014  
-:Author: tim    
-"""
-import logging
-logging.basicConfig(level=logging.DEBUG)
-logging.getLogger("spyne.protocol.xml").setLevel(logging.DEBUG)
+# coding: utf-8
+from __future__ import absolute_import
 
 from wsgiref.simple_server import make_server
+import logging
 
+from six.moves import range
 from spyne.application import Application
-from spyne.service import ServiceBase
 from spyne.decorator import rpc
-from spyne.server.wsgi import WsgiApplication
-from spyne.model.primitive import Integer, Unicode
 from spyne.model.complex import Iterable
+from spyne.model.primitive import Integer
+from spyne.model.primitive import Unicode
+from spyne.server.wsgi import WsgiApplication
+from spyne.service import ServiceBase
 
-from spyne_smev.wsse.protocols import Soap11WSSE, X509TokenProfile
+from spyne_smev.wsse.protocols import Soap11WSSE
+from spyne_smev.wsse.protocols import X509TokenProfile
+
+
+logging.basicConfig(level=logging.DEBUG)
+logging.getLogger("spyne.protocol.xml").setLevel(logging.DEBUG)
 
 
 TEST_PRIVATE_KEY = """\
@@ -67,7 +66,7 @@ class HelloService(ServiceBase):
 
     @rpc(Unicode, Integer, _returns=Iterable(Unicode))
     def SayHello(ctx, Name, Times):
-        return (u"Hello, {0}!".format(Name) for _ in xrange(Times))
+        return (u"Hello, {0}!".format(Name) for _ in range(Times))
 
 security = X509TokenProfile(
     private_key=TEST_PRIVATE_KEY, private_key_pass="12345678",

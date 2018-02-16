@@ -1,22 +1,18 @@
-# -*- coding: utf-8 -*-
-
-"""               
-utils.py
-                  
-:Created: 03 Jul 2014  
-:Author: tim    
-"""
+# coding: utf-8
+from __future__ import absolute_import
 
 from copy import deepcopy as _deepcopy
-import base64 as _base64
 from functools import partial as _partial
+import base64 as _base64
 import uuid as _uuid
 
 from lxml import etree as _etree
+import six
 
-from spyne_smev import crypto as _crypto
 from spyne_smev import _utils
 from spyne_smev import _xmlns
+from spyne_smev import crypto as _crypto
+
 
 _nsmap = _xmlns.nsmap
 
@@ -28,7 +24,9 @@ _c14n_nsmap = {
     (False, True): _xmlns.xml_c14n_wc,
 }
 
-_c14n_params = dict((v, k) for k, v in _c14n_nsmap.iteritems())
+_c14n_params = dict(
+    (v, k) for k, v in six.iteritems(_c14n_nsmap)
+)
 
 _digest_method_nsmap = {
     "md_gost94": _xmlns.gost94,
@@ -38,7 +36,9 @@ _digest_method_nsmap = {
     "md5": _xmlns.md5,
 }
 
-_digest_method_names = dict((v, k) for k, v in _digest_method_nsmap.items())
+_digest_method_names = dict(
+    (v, k) for k, v in six.iteritems(_digest_method_nsmap)
+)
 
 _signature_method_nsmap = {
     "RSA-SHA1": _xmlns.rsa_sha1,
@@ -276,10 +276,10 @@ def verify_document(document, certificate):
     exc_c14n, with_comments = _c14n_params.get(c14n_method)
     inc_ns = transform.find("{{{0}}}InclusiveNamespaces".format(
         _xmlns.exc_c14n))
-    if not inc_ns is None:
+    if inc_ns is not None:
         inc_ns_prefixes = inc_ns.attrib["PrefixList"].split()
         inc_ns_map = dict(
-            (k, v) for k, v in document.nsmap.iteritems()
+            (k, v) for k, v in six.iteritems(document.nsmap)
             if k in inc_ns_prefixes)
     else:
         inc_ns_map = None
@@ -315,10 +315,10 @@ def verify_document(document, certificate):
     exc_c14n, with_comments = _c14n_params.get(c14n_method)
     inc_ns = c14n_method_node.find("{{{0}}}InclusiveNamespaces".format(
         _xmlns.exc_c14n))
-    if not inc_ns is None:
+    if inc_ns is not None:
         inc_ns_prefixes = inc_ns.attrib["PrefixList"].split()
         inc_ns_map = dict(
-            (k, v) for k, v in document.nsmap.iteritems()
+            (k, v) for k, v in six.iteritems(document.nsmap)
             if k in inc_ns_prefixes)
     else:
         inc_ns_map = None

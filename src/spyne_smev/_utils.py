@@ -1,19 +1,21 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
+from __future__ import absolute_import
 
-"""
-factory.py
-
-:Created: 3/13/14
-:Author: timic
-"""
 import os
-from StringIO import StringIO
 
 from lxml import etree
-from six import binary_type, text_type, PY3
-from spyne.model.complex import ComplexModelMeta, ComplexModelBase
+from six import PY3
+from six import binary_type
+from six import text_type
+from six.moves import cStringIO as StringIO
+from spyne.model.complex import ComplexModelBase
+from spyne.model.complex import ComplexModelMeta
 
-el_name_with_ns = lambda ns: lambda el: '{%s}%s' % (ns, el)
+
+def el_name_with_ns(ns):
+    def inner(el):
+        return '{%s}%s' % (ns, el)
+    return inner
 
 
 class EmptyCtx(object):
@@ -21,8 +23,9 @@ class EmptyCtx(object):
     def __getattr__(self, name):
         return self.__dict__.get(name, EmptyCtx())
 
-    def __nonzero__(self):
+    def __bool__(self):
         return False
+    __nonzero__ = __bool__
 
 
 def copy_with_nsmap(element, nsmap):
@@ -91,6 +94,7 @@ def native(s):
             return s.encode("utf-8")
     return s
 
+
 if PY3:
     def byte_string(s):
         return s.encode("charmap")
@@ -99,5 +103,9 @@ else:
         return s
 
 
-isnone = lambda obj: obj is None
-notisnone = lambda obj: not obj is None
+def isnone(obj):
+    return obj is None
+
+
+def notisnone(obj):
+    return obj is not None

@@ -1,13 +1,7 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
+from __future__ import absolute_import
 
-"""
-client.py
-
-:Created: 5/29/14
-:Author: timic
-"""
 import logging as _logging
-logger = _logging.getLogger(__name__)
 
 from lxml import etree as _etree
 from suds.client import Client as _SudsClient
@@ -16,6 +10,9 @@ from suds.sax.parser import Parser as _Parser
 
 from spyne_smev import crypto as _crypto
 from spyne_smev.wsse import utils as _utils
+
+
+logger = _logging.getLogger(__name__)
 
 
 class Client(_SudsClient):
@@ -48,7 +45,7 @@ class Client(_SudsClient):
             digest_method="sha1",
             security_direction=BOTH, **kwargs):
 
-        if not security_direction in (self.IN, self.OUT, self.BOTH):
+        if security_direction not in (self.IN, self.OUT, self.BOTH):
             raise ValueError(
                 "direction should be constant either IN, OUT or BOTH!")
 
@@ -122,7 +119,7 @@ class _WsseSecurity(_MessagePlugin):
                 out_document = _utils.sign_document(
                     document, self.certificate, self.private_key,
                     self.private_key_password, self.digest_method)
-            except Exception, e:
+            except Exception as e:
                 logger.error("Cannot sign document")
                 logger.exception(e)
                 raise
@@ -140,7 +137,7 @@ class _WsseSecurity(_MessagePlugin):
             try:
                 _utils.verify_document(document, self.in_certificate)
                 self._verified = True
-            except Exception, e:
+            except Exception as e:
                 logger.exception(e)
                 raise
             finally:

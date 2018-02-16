@@ -1,11 +1,5 @@
-# -*- coding: utf-8 -*-
-
-"""               
-fault.py
-                  
-:Created: 19 Aug 2014  
-:Author: tim    
-"""
+# coding: utf-8
+from __future__ import absolute_import
 
 from spyne.model.fault import Fault as _Fault
 

@@ -1,11 +1,6 @@
-# -*- coding: utf-
+# coding: utf-8
+from __future__ import absolute_import
 
-"""               
-__init__.py.py
-                  
-:Created: 12 Jun 2014  
-:Author: tim    
-"""
 from spyne.interface.wsdl.wsdl11 import Wsdl11
 
 

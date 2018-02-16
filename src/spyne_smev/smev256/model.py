@@ -1,17 +1,15 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
+from __future__ import absolute_import
 
-"""
-models.py
-
-:Created: 3/26/14
-:Author: timic
-"""
-
-from spyne.model.primitive import Unicode, Integer, DateTime
-from spyne.model.binary import File, BINARY_ENCODING_BASE64
+from spyne.model.binary import BINARY_ENCODING_BASE64
+from spyne.model.binary import File
+from spyne.model.primitive import DateTime
+from spyne.model.primitive import Integer
+from spyne.model.primitive import Unicode
 
 from .._utils import namespace
 from .._xmlns import smev256
+
 
 SmevModel = namespace(smev256)
 

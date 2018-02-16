@@ -1,12 +1,5 @@
-# -*- coding: utf-
-
-"""               
-wsgi.py
-                  
-:Created: 12 Jun 2014  
-:Author: tim    
-"""
-
+# coding: utf-8
+from __future__ import absolute_import
 
 from spyne.server.wsgi import WsgiApplication as _SpyneWsgiApplication
 
