@@ -79,9 +79,11 @@ class X509TokenProfile(BaseWSS):
                 envelope, self.certificate, self.private_key,
                 self._private_key_pass, self.digest_method)
         except ValueError as e:
-            logger.error(
-                "Error occurred while signing document:\n{0}\n"
-                "Keep it unsigned ...".format(six.text_type(e)))
+            logger.error('\n'.join((
+                'Error occurred while signing document:',
+                six.text_type(e),
+                'Keep it unsigned...'
+            )))
             return unsigned
 
     def validate(self, envelope):
@@ -95,11 +97,12 @@ class X509TokenProfile(BaseWSS):
         try:
             verify_document(envelope, self.certificate)
         except (_crypto.Error, ValueError) as e:
-            logger.error("Signature check failed! Error:\n{0}".format(
-                six.text_type(e)))
-            raise _Fault(
-                faultstring="Signature check failed! Error:\n{0}".format(
-                    six.text_type(e)))
+            logger.error(
+                "Signature check failed! Error:\n%s", six.text_type(e)
+            )
+            raise _Fault(faultstring=(
+                "Signature check failed! Error:\n" + six.text_type(e)
+            ))
         except _crypto.InvalidSignature:
             raise _Fault(faultstring="Invalid signature!")
 
@@ -135,7 +138,7 @@ class Soap11WSSE(_Soap11):
             else:
                 xml_string = ''.join(in_string)
             ctx.in_string = iter(in_string)
-            logger.debug("%s %s" % (line_header, xml_string))
+            logger.debug("%s %s", line_header, xml_string)
         super(Soap11WSSE, self).create_in_document(ctx, charset)
         if self.wsse_security:
             in_document, _ = ctx.in_document

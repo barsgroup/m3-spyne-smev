@@ -64,6 +64,7 @@ class Client(_SudsClient):
             self._in_certificate = self.certificate
 
         if self.certificate and self.private_key:
+            # pylint: disable=protected-access
             self._security = _WsseSecurity(
                 self.private_key, private_key_pass or _crypto._ffi.NULL,
                 self.certificate, self.in_certificate,

@@ -5,18 +5,16 @@ import logging as _logging
 import os
 
 from lxml import etree as _etree
-from six.moves import filter
 from six.moves import map
 from spyne.const.http import HTTP_200
 from spyne.interface.wsdl.wsdl11 import Wsdl11 as _Wsdl11
 from spyne.model.fault import Fault as _Fault
 import six
 
-from wsse.protocols import Soap11WSSE
-
 from . import _utils
 from . import _xmlns as _ns
 from .fault import ApiError as _ApiError
+from .wsse.protocols import Soap11WSSE
 
 
 logger = _logging.getLogger(__name__)
@@ -230,6 +228,7 @@ class BaseSmevWsdl(_Wsdl11):
                 0, xop_include_schema)
 
         self._add_smev_headers(self.root_elt)
+        # pylint: disable=attribute-defined-outside-init
         self._Wsdl11__wsdl = _etree.tostring(
             self.root_elt, encoding='UTF-8')
 

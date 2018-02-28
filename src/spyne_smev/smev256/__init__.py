@@ -7,17 +7,16 @@ import os
 from lxml import etree
 import six
 
-from model import AppDocument
-from model import HeaderType
-from model import MessageType
-from model import ServiceType
-
 from .. import _xmlns as ns
 from .._base import BaseSmev
 from .._base import BaseSmevWsdl
 from .._utils import EmptyCtx
 from .._utils import el_name_with_ns
 from ..fault import ApiError as _ApiError
+from .model import AppDocument
+from .model import HeaderType
+from .model import MessageType
+from .model import ServiceType
 
 
 try:
@@ -90,7 +89,7 @@ class Smev256(BaseSmev):
         :param ctx: Сквозной контекст метода
         :rtype: lxml.etree.Element
         """
-
+        # pylint: disable=too-many-locals
         # TODO: сделать нормальный биндинг
 
         if getattr(ctx, "udc", None) is None:

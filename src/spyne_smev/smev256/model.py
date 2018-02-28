@@ -15,14 +15,14 @@ SmevModel = namespace(smev256)
 
 
 class OrgExternalType(SmevModel):
-    Code = Unicode(type_name="Code", pattern="[A-Z0-9]{4}\d{5}")
+    Code = Unicode(type_name="Code", pattern=r"[A-Z0-9]{4}\d{5}")
     Name = Unicode(type_name="Name")
 
 
 class ServiceType(SmevModel):
     Mnemonic = Unicode(type_name="Mnemonic", min_occurs=1, max_occurs=1)
     Version = Unicode(
-        type_name="Version", pattern="\d{1,2}\.\d{2}",
+        type_name="Version", pattern=r"\d{1,2}\.\d{2}",
         min_occurs=1, max_occurs=1)
 
 

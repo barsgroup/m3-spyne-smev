@@ -72,6 +72,7 @@ def _construct_wsse_header(
         actor="http://smev.gosuslugi.ru/actors/smev",
         digest_method="sha1",
         signature_method=None):
+    # pylint: disable=too-many-locals
     digest_method_ns = _digest_method_nsmap.get(digest_method, None)
     if digest_method_ns is None:
         raise ValueError("No such digest method: {0}".format(digest_method))
@@ -154,7 +155,7 @@ def sign_document(
     :return: Signed document
     :rtype: lxml.etree.Element
     """
-
+    # pylint: disable=too-many-locals
     _c14n = _partial(
         _etree.tostring, method="c14n",
         exclusive=c14n_exclusive, with_comments=c14n_with_comments)
@@ -216,7 +217,7 @@ def verify_document(document, certificate):
     :type document: lxml.etree.Element
     :raises: ValueError, spyne_smev.crypto.InvalidSignature
     """
-
+    # pylint: disable=too-many-locals, too-many-branches, too-many-statements
     body = document.find("./{{{soapenv}}}Body".format(**_nsmap))
     if body is None:
         raise ValueError(

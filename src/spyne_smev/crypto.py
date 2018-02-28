@@ -5,6 +5,7 @@ from functools import partial as _partial
 import logging as _logging
 
 from cryptography.hazmat.bindings.openssl.binding import Binding as _Binding
+from six import text_type
 
 from . import _utils
 
@@ -53,7 +54,7 @@ def _exception_from_error_queue(exception_type):
 _raise_current_error = _partial(_exception_from_error_queue, Error)
 
 
-def get_text_digest(text, digest_name="sha1"):
+def get_text_digest(text, digest_name=b"sha1"):
     """
     Returns binary digest value for given text.
 
@@ -61,6 +62,8 @@ def get_text_digest(text, digest_name="sha1"):
     :param str digest_name: Digest algorithm name
     :return str: text digest
     """
+    if isinstance(digest_name, text_type):
+        digest_name = digest_name.encode('utf-8')
     evp_md = _lib.EVP_get_digestbyname(digest_name)
 
     if evp_md == _ffi.NULL:

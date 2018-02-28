@@ -28,6 +28,7 @@ class ApiError(_Fault):
 
     def __init__(
             self, errorCode, errorMessage, messageName, Status="INVALID"):
+        # pylint: disable=super-init-not-called
         self.errorCode = errorCode
         self.errorMessage = errorMessage
         self.messageName = messageName
