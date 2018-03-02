@@ -79,7 +79,10 @@ def _construct_wsse_header(
 
     if not signature_method:
         signature_method = _crypto.get_signature_algorithm_name(certificate)
-    signature_method_ns = _signature_method_nsmap.get(signature_method, None)
+    signature_method_ns = _utils.get_dict_value(
+        _signature_method_nsmap,
+        signature_method
+    )
     if signature_method_ns is None:
         raise ValueError(
             "No such signature method: {0}".format(signature_method))
@@ -197,8 +200,11 @@ def sign_document(
         "./{{{soapenv}}}Header/{{{wsse}}}Security"
         "/{{{ds}}}Signature/{{{ds}}}SignedInfo".format(**_nsmap))
     signature_algorithm = _crypto.get_signature_algorithm_name(cert_data)
-    signature_algorithm = _signature_method_exclusions.get(
-        signature_algorithm, signature_algorithm)
+    signature_algorithm = _utils.get_dict_value(
+        _signature_method_exclusions,
+        signature_algorithm,
+        signature_algorithm
+    )
     signature_value = _base64.b64encode(_crypto.sign(
         _c14n(sign_info_node), pkey_data, pkey_pass, signature_algorithm))
     sign_val_node = out_document.find(
@@ -290,7 +296,7 @@ def verify_document(document, certificate):
              inclusive_ns_prefixes=inc_ns_map),
         digest_name))
 
-    if body_digest != digest_value.text:
+    if body_digest.decode() != digest_value.text:
         raise _crypto.InvalidSignature("Invalid `Body` digest!")
     signature_method = document.find(
         ".//{{{ds}}}SignatureMethod".format(**_nsmap))

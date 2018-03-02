@@ -97,7 +97,9 @@ def native(s):
 
 if PY3:
     def byte_string(s):
-        return s.encode("charmap")
+        if not isinstance(s, bytes):
+            s = s.encode("charmap")
+        return s
 else:
     def byte_string(s):
         return s
@@ -109,3 +111,17 @@ def isnone(obj):
 
 def notisnone(obj):
     return obj is not None
+
+
+def get_dict_value(source, key, default=None):
+    """Получает значение из словаря по заданному ключу.
+    
+    Используется для случаев, когда в качетсве ключа в словаре используется 
+    строковое значение, а `key` может содержать последовательность байт.
+    :param dict source: Словарь.
+    :param (str, bytes) key: Ключ.
+    :param default: Значение по-умолчанию.
+    """
+    if isinstance(key, bytes):
+        key = key.decode()
+    return source.get(key, default)
