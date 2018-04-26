@@ -69,7 +69,7 @@ def get_text_digest(text, digest_name=b"sha1"):
     if evp_md == _ffi.NULL:
         raise ValueError("No such digest method")
 
-    evp_md_ctx = _lib.EVP_MD_CTX_create()
+    evp_md_ctx = _lib.Cryptography_EVP_MD_CTX_new()
     if _lib.EVP_DigestInit_ex(evp_md_ctx, evp_md, _ffi.NULL) == 0:
         _raise_current_error()
 
@@ -84,7 +84,7 @@ def get_text_digest(text, digest_name=b"sha1"):
     if _lib.EVP_DigestFinal_ex(evp_md_ctx, result_buf, result_len) == 0:
         _raise_current_error()
 
-    _lib.EVP_MD_CTX_destroy(evp_md_ctx)
+    _lib.Cryptography_EVP_MD_CTX_free(evp_md_ctx)
 
     return b"".join(_ffi.buffer(result_buf, result_len[0]))
 
@@ -105,8 +105,7 @@ def sign(
     if md == _ffi.NULL:
         raise ValueError("No such digest method: {0}".format(digest_name))
 
-    md_ctx = _ffi.new("EVP_MD_CTX *")
-    md_ctx = _ffi.gc(md_ctx, _lib.EVP_MD_CTX_cleanup)
+    md_ctx = _lib.Cryptography_EVP_MD_CTX_new()
 
     if _lib.EVP_SignInit(md_ctx, md) != 1:
         _raise_current_error()
@@ -232,7 +231,7 @@ def _load_private_key(pem_buffer, pass_phrase=_ffi.NULL):
 def get_signature_algorithm_name(certificate):
 
     cert = _load_certificate(certificate)
-    digest_nid = _lib.OBJ_obj2nid(cert.cert_info.signature.algorithm)
+    digest_nid = _lib.X509_get_signature_nid(cert)
     if digest_nid == _lib.NID_undef:
         raise ValueError("Unsupported certificate signature algorithm")
 
