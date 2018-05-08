@@ -1,8 +1,10 @@
-include REQUIREMENTS README README.md LICENSE DESCRIPTION
-include version.conf
-recursive-include requirements *
-recursive-include src *
-recursive-exclude src *.pyc
-recursive-exclude src *.orig
+graft src
+
+global-exclude *.pyc
+global-exclude __pycache__
 prune src/examples
 prune src/tests
+
+include README.md
+include DESCRIPTION
+include version.conf
