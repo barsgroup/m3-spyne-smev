@@ -1,5 +1,5 @@
 # dev specificIDE specific files
-.idea/*
+**/.idea/*
 .ropeproject/*
 .codeintel/*
 .project
