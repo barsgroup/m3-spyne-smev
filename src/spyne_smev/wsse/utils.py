@@ -28,8 +28,11 @@ _c14n_params = dict(
     (v, k) for k, v in six.iteritems(_c14n_nsmap)
 )
 
+
 _digest_method_nsmap = {
     "md_gost94": _xmlns.gost94,
+    "md_gost12_256": _xmlns.md_gost2012_256,
+    "md_gost12_512": _xmlns.md_gost2012_512,
     "sha1": _xmlns.sha1,
     "sha256": _xmlns.sha256,
     "sha512": _xmlns.sha512,
@@ -46,6 +49,8 @@ _signature_method_nsmap = {
     "RSA-SHA512": _xmlns.rsa_sha512,
     "RSA-MD5": _xmlns.rsa_md5,
     "id-GostR3411-94-with-GostR3410-2001": _xmlns.gost2001,
+    "id-tc26-signwithdigest-gost3410-2012-256": _xmlns.gost2012_256,
+    "id-tc26-signwithdigest-gost3410-2012-512": _xmlns.gost2012_512,
 }
 
 _signature_method_names = dict(
@@ -53,6 +58,8 @@ _signature_method_names = dict(
 
 _signature_method_exclusions = {
     "id-GostR3411-94-with-GostR3410-2001": "md_gost94",
+    "id-tc26-signwithdigest-gost3410-2012-256": "md_gost12_256",
+    "id-tc26-signwithdigest-gost3410-2012-512": "md_gost12_512",
 }
 
 

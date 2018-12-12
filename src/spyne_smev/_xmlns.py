@@ -27,6 +27,22 @@ md5 = "http://www.w3.org/2000/09/xmldsig-more#md5"
 rsa_md5 = "http://www.w3.org/2000/09/xmldsig-more#rsa-md5"
 gost94 = "http://www.w3.org/2001/04/xmldsig-more#gostr3411"
 gost2001 = "http://www.w3.org/2001/04/xmldsig-more#gostr34102001-gostr3411"
+gost2012_256 = (
+    "urn:ietf:params:xml:ns:cpxmlsec:"
+    "algorithms:gostr34102012-gostr34112012-256"
+)
+md_gost2012_256 = (
+    "urn:ietf:params:xml:ns:cpxmlsec:"
+    "algorithms:gostr34102012-gostr34112012-256"
+)
+gost2012_512 = (
+     "urn:ietf:params:xml:ns:cpxmlsec:"
+     "algorithms:gostr34102012-gostr34112012-512"
+)
+md_gost2012_512 = (
+    "urn:ietf:params:xml:ns:cpxmlsec:"
+    "algorithms:gostr34102012-gostr34112012-512"
+)
 
 exc_c14n = "http://www.w3.org/2001/10/xml-exc-c14n#"
 exc_c14n_wc = "http://www.w3.org/2001/10/xml-exc-c14n#WithComments"
