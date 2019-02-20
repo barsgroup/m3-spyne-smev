@@ -32,16 +32,14 @@ gost2012_256 = (
     "algorithms:gostr34102012-gostr34112012-256"
 )
 md_gost2012_256 = (
-    "urn:ietf:params:xml:ns:cpxmlsec:"
-    "algorithms:gostr34102012-gostr34112012-256"
+    "urn:ietf:params:xml:ns:cpxmlsec:algorithms:gostr34112012-256"
 )
 gost2012_512 = (
      "urn:ietf:params:xml:ns:cpxmlsec:"
      "algorithms:gostr34102012-gostr34112012-512"
 )
 md_gost2012_512 = (
-    "urn:ietf:params:xml:ns:cpxmlsec:"
-    "algorithms:gostr34102012-gostr34112012-512"
+    "urn:ietf:params:xml:ns:cpxmlsec:algorithms:gostr34112012-512"
 )
 
 exc_c14n = "http://www.w3.org/2001/10/xml-exc-c14n#"
