@@ -51,6 +51,12 @@ class Smev256(BaseSmev):
     _ns = ns.nsmap256
     _interface_document_type = Smev256Wsdl
 
+    def __init__(self, *args, **kwargs):
+        super(Smev256, self).__init__(*args, **kwargs)
+
+        # Разрешаем парсить большие XML.
+        self.parser_kwargs['huge_tree'] = True
+
     def construct_smev_envelope(self, ctx, message):
         smev_message = self._create_message_element(ctx)
         message_data = self._create_message_data_element(ctx)
