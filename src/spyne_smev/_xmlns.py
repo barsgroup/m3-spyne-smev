@@ -3,6 +3,7 @@ from __future__ import absolute_import
 
 
 smev245 = "http://smev.gosuslugi.ru/rev111111"
+smev255 = "http://smev.gosuslugi.ru/rev120315"
 smev256 = "http://smev.gosuslugi.ru/rev120315"
 soapenv = "http://schemas.xmlsoap.org/soap/envelope/"
 wsdl = "http://schemas.xmlsoap.org/wsdl/"
@@ -65,6 +66,9 @@ nsmap = {
     'ds': ds,
     'wsdl': wsdl,
 }
+nsmap255 = nsmap.copy()
+nsmap255.update({'smev': smev255})
+
 nsmap256 = nsmap.copy()
 nsmap256.update({'smev': smev256})
 
