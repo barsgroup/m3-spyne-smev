@@ -1,7 +1,7 @@
 # coding: utf-8
-import os
 from os.path import dirname
 from os.path import join
+import os
 
 from setuptools import find_packages
 from setuptools import setup
@@ -22,6 +22,7 @@ class _CustomInstallCommand(install):
     В этом случае пакет cryptography будет использовать пакет openssl,
     установленный в системе.
     """
+
     def run(self):
         os.system('pip install "cryptography>=2.2.2,<3" '
                   '--ignore-installed --no-binary cryptography')
@@ -40,7 +41,6 @@ setup(
     package_dir={'': 'src'},
     packages=find_packages('src'),
     description=_read('DESCRIPTION'),
-    long_description=_read('README.md'),
     include_package_data=True,
     classifiers=[
         'Intended Audience :: Developers',

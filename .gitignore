@@ -15,6 +15,7 @@
 # setuptools specific
 .eggs
 dist
+build
 *.egg-info
 .tox
 
