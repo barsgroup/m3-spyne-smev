@@ -201,6 +201,7 @@
             <xs:element ref="smev:PacketIds" minOccurs="0"/>
         </xs:sequence>
         <xs:attribute name="actor" type="xs:string"/>
+        <xs:anyAttribute namespace="##any" processContents="lax"/>
     </xs:complexType>
     <xs:complexType name="BaseMessageType">
         <xs:sequence>
