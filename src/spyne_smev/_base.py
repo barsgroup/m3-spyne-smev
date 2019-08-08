@@ -1,15 +1,17 @@
 # coding: utf-8
+
 from __future__ import absolute_import
 
 import logging as _logging
 import os
 
-from lxml import etree as _etree
 from six.moves import map
+import six
+
+from lxml import etree as _etree
 from spyne.const.http import HTTP_200
 from spyne.interface.wsdl.wsdl11 import Wsdl11 as _Wsdl11
 from spyne.model.fault import Fault as _Fault
-import six
 
 from . import _utils
 from . import _xmlns as _ns
@@ -228,7 +230,6 @@ class BaseSmevWsdl(_Wsdl11):
                 0, xop_include_schema)
 
         self._add_smev_headers(self.root_elt)
-        # pylint: disable=attribute-defined-outside-init
         self._Wsdl11__wsdl = _etree.tostring(
             self.root_elt, encoding='UTF-8')
 
@@ -271,15 +272,25 @@ class BaseSmevWsdl(_Wsdl11):
             nsmap={"smev": self.smev_ns},
             name="SmevHeader", element="smev:Header")
 
+        # В новых версиях файл xml_ns.py не используется
+        # (заменен на xml.py),
+        # поэтому нужно использовать константы из него.
+        # Для версий (version > 2.12.16) словарь self._ns
+        # не содержит ключ soap.
+        soap = (
+            self._ns['soap'] if 'soap' in self._ns
+            else self._ns['wsdlsoap11']
+        )
+
         for operation in operations:
             binding = operation.getparent().getparent().find(
-                "{{{soap}}}binding".format(**self._ns))
+                "{{{0}}}binding".format(soap))
             style = binding.attrib['style']
-            header = operation.find("./{{{soap}}}header".format(**self._ns))
+            header = operation.find("./{{{0}}}header".format(soap))
             if header and style == 'document':
                 binding['style'] = 'rpc'
             _etree.SubElement(
-                operation, "{{{soap}}}header".format(**self._ns),
+                operation, "{{{0}}}header".format(soap),
                 nsmap={"smev": self.smev_ns},
                 message="tns:SmevHeader",
                 part="SmevHeader",
