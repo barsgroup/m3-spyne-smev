@@ -74,8 +74,10 @@ setup(
         "cryptography>=2.2.2,<3",
         "requests>=2,<3",
         "spyne>=2.11,<3",
-        "suds>=0.4,<1; python_version == '2.7'",
-        "suds-py3>=1.3.3.0,<2; python_version > '2.7'",
     ),
+    extras_require={
+        ":python_version == '2.7'": ["suds>=0.4,<1"],
+        ":python_version > '2.7'": ["suds-py3>=1.3.3.0,<2"],
+    },
     set_build_info=dirname(__file__),
 )
