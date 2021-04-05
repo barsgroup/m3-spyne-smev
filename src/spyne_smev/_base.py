@@ -171,8 +171,8 @@ class BaseSmevWsdl(_Wsdl11):
 
     __smev_schema = None
 
-    def __init__(self, interface=None, _with_partnerlink=False):
-        super(BaseSmevWsdl, self).__init__(interface, _with_partnerlink)
+    def __init__(self, *args, **kwargs):
+        super(BaseSmevWsdl, self).__init__(*args, **kwargs)
         self._ns = self.interface.nsmap.copy()
         self._ns.update({'smev': self.smev_ns})
 
